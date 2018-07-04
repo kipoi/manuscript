@@ -1,0 +1,17 @@
+workdir:
+    "../../"
+ROOT = "../../"
+DATA = "data/"
+
+
+rule all:
+    input:
+        DATA + "raw/tlearn/experiments.tsv"
+
+rule download_experiments:
+    output:
+        tsv=DATA + "raw/tlearn/experiments.tsv"
+    shell:
+        """
+        wget --header="Host: docs.google.com" --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36" --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" --header="Accept-Language: en-US,en;q=0.9,de-DE;q=0.8,de;q=0.7,sl;q=0.6" --header="Cookie: S=apps-spreadsheets=uXVitwXcc-LlRw26HjEBP_kJ3ur96syR; CONSENT=YES+DE.en+20151206-18-0; HSID=Ayoa7cYrh4_cqamOy; SSID=AxJvHdGCF4iowhT1D; APISID=DHx5MXSPPKKcPaG4/AKyNWGNkh2UNDgP0t; SAPISID=YZCJVwKfuLc_M8QM/AHdjhg1Yb_9Tjn40w; SID=AwaCiFwHWfKEag0pAggmnrrXZHAEQx-gsrksJzuXXmbtkKTv4vZO1uOQI4doXtqQDz6geg.; S=explorer=tc4x765CfRurkDqdaHnf-VWCmvUgOivU; NID=129=kiXI-KtDCl24dlxur2UXkTFX5A3uCzhkzxdRMTNNdFkr92MyqrJ87cjEX1VUpO0zwJJwLAMa1HAQVwvq_wtIDait33XTZDCV-8gIfcRIKtQqIFcqhkcFPWrkR9F8RwOPPQxTHVnT7PilVrsasBvt_Q1zRSoZMiDKMXcvDGn6rDBimpd7jNA6a8NB1neenXalCAkv5OIK0QvawOX8i6BlX7hM6cM_5EkQ88WH2piAuPnS96i0gwwWo8SPL10yRgIoZ5WY0QQxwwJh_NjBr4ryZ7LB0OeDgx3aczvFW3e8f65kvFtZLEXcNL3Oi6j_lL-efCbEZ8XRdCVg-k-M7AlDKKpb4Z6Io7UKvNCvX0_dSxQKVnlcYujNl1A; 1P_JAR=2018-4-28-1; SIDCC=AEfoLebSfueTjSSttY0z1kVUkEL7T7nDyiOQ-REiO86JcZXv62ZtfuhevKs8RJVe7WrAjKsQ32M" --header="Connection: keep-alive" "https://docs.google.com/spreadsheets/u/2/d/1UVfXq6R9dzpEajjXpn8X_SoTdMAi6onKGB12Zk8JGIY/export?format=tsv&id=1UVfXq6R9dzpEajjXpn8X_SoTdMAi6onKGB12Zk8JGIY&gid=0" -O {output.tsv} -c 
+        """

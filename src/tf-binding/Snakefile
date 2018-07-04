@@ -1,0 +1,251 @@
+"""
+Snakefile for the splicing model
+"""
+workdir:
+    "../../../"
+ROOT = "../../.."
+DATA = "data/"
+
+import sys
+from kipoi.cli.env import get_env_name
+from glob import glob
+
+# Folder structure for data:
+# - raw: raw/tfbinding/eval/<task>/files...
+# - processed:
+#   - processed/tfbinding/eval/preds/
+#   - processed/tfbinding/eval/metrics/
+#   - processed/tfbinding/eval/plots/
+
+# --------------------------------------------
+# Config
+from m_kipoi.exp.tfbinding.config import (DATA, FASTA, TF_C_pairs, TFS, CELL_TYPES,
+                                          HOLDOUT_CHR, TF2CT, SINGLE_TASK_MODELS, get_dl_kwargs)
+
+# TODO - fix this - use a single name for the model
+ENVIRONMENTS = {
+    "DeepSEA": "DeepSEA/predict",
+    "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/CEBPB",
+    "DeepBind": "DeepBind/D00317.009",
+    "FactorNet": "FactorNet/JUND/meta_Unique35_DGF",
+    "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
+    "lsgkm-SVM2": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
+}
+
+# --------------------------------------------
+def get_env_executable(env):
+    return os.path.abspath(os.path.join(sys.executable, "../../envs/{env}/bin/kipoi".format(env=env)))
+
+
+rule all:
+    input:
+        # Raw data
+        expand(DATA + "raw/tfbinding/eval/DNASE/DNASE.{ctype}.fc.signal.bigwig",
+               ctype=CELL_TYPES),
+        expand(DATA + "raw/tfbinding/eval/intervals/" +
+               "chr8_wide_bin101_flank0_stride101.{tf}.{ctype}.intervals_file.tsv.gz",
+               zip, tf=TFS, ctype=CELL_TYPES),
+        # FactorNet DNase
+        expand(DATA + "raw/tfbinding/eval/DNASE/FactorNet/{ctype}.1x.bw", ctype=CELL_TYPES),
+        # Environments
+        [get_env_executable(env) for env in ENVIRONMENTS],
+
+        # predictions
+        [DATA + "processed/tfbinding/eval/preds/{tf}/{model}.h5".format(tf=tf, model=model)
+         for tf, value in SINGLE_TASK_MODELS.items()
+         for model, model_name in value.items()
+         if model_name is not None],
+
+        # runtime evaluation
+        [DATA + "processed/tfbinding/eval/runtimes/{tf}/{model}.{batch_size}.json".format(tf='JUND', batch_size=256, model=model)
+         for model, model_name in SINGLE_TASK_MODELS['JUND'].items()
+         if model_name is not None],
+
+        # metrics
+        "data/processed/tfbinding/eval/metrics/all_models.chr8.csv",
+
+        # plots
+        expand("data/processed/tfbinding/eval/plots/all_models.chr8.{fmt}",
+               fmt=['pdf', 'png'])
+
+
+# --------------------------------------------
+# Get all the evaluation data
+
+EVAL_FILES = ['chr8_wide_bin101_flank0_stride101.CEBPB.HeLa-S3.intervals_file.tsv.gz',
+              'chr8_wide_bin101_flank0_stride101.HepG2.JUND.intervals_file.tsv.gz',
+              'chr8_wide_bin101_flank0_stride101.MAFK.K562.intervals_file.tsv.gz',
+              'chr8_wide_bin101_flank0_stride101.NANOG.H1-hESC.intervals_file.tsv.gz']
+
+rule get_intervals:
+    """Gets the intervals data for evaluation
+    """
+    output:
+        expand(DATA + "raw/tfbinding/eval/intervals/{f}", f=EVAL_FILES)
+    shell:
+        "rsync -a 'nandi:/srv/scratch/manyu/kipoi/manuscript_code/experiments/tfbinding/interval_files/chr8_*' data/raw/tfbinding/eval/intervals/"
+
+rule rename_JUND:
+    input:
+        DATA + "raw/tfbinding/eval/intervals/chr8_wide_bin101_flank0_stride101.HepG2.JUND.intervals_file.tsv.gz"
+    output:
+        DATA + "raw/tfbinding/eval/intervals/chr8_wide_bin101_flank0_stride101.JUND.HepG2.intervals_file.tsv.gz"
+    shell:
+        "mv {input} {output}"
+
+
+rule get_DNase_data:
+    """Get the DNase datasets"""
+    input:
+        dnase = "/mnt/data/TF_binding/DREAM_challenge/public_data/DNASE/" + \
+            "fold_coverage_wiggles/DNASE.{ctype}.fc.signal.bigwig"
+    output:
+        dnase = DATA + "raw/tfbinding/eval/DNASE/DNASE.{ctype}.fc.signal.bigwig"
+    shell:
+        "ln -srf {input.dnase} {output.dnase}"
+
+synapse_DNASE = {
+    "HeLa-S3": "syn8073618",
+    "K562": "syn8073483",
+    "HepG2": "syn8073517",
+    "H1-hESC": "syn8073583",
+}
+
+rule get_DNase_data_factornet:
+    """Get the DNase datasets for factornet"""
+    output:
+        dnase = DATA + "raw/tfbinding/eval/DNASE/FactorNet/{ctype}.1x.bw"
+    params:
+        def syn(wildcards): return synapse_DNASE[wildcards.ctype]
+    shell:
+        "synapse get {params.syn} --downloadLocation $(dirname {output.dnase})"
+
+# --------------------------------------------
+# Setup the environment
+rule create_conda_env:
+    """Create one conda environment per model"""
+    output:
+        env = os.path.abspath(os.path.join(sys.executable, "../../envs/{env}/bin/kipoi"))
+    params:
+        def env_name(wildcards): return ENVIRONMENTS[wildcards.env]
+    shell:
+        "kipoi env create {params.env_name} -e {wildcards.env} --gpu"
+
+# --------------------------------------------
+# Evaluate the models
+rule predict:
+    """Run model prediction"""
+    input:
+        env_bin = os.path.abspath(os.path.join(sys.executable, "../../envs/{model}/bin/kipoi"))
+        # TODO - add further file dependencies
+    output:
+        preds = DATA + "processed/tfbinding/eval/preds/{tf}/{model}.h5"
+    params:
+        def model(wildcards): return SINGLE_TASK_MODELS[wildcards.tf][wildcards.model],
+
+        def dl_kwargs(wildcards): return get_dl_kwargs(wildcards.tf),
+
+        def batch_size(wildcards): return 1024 if wildcards.model.startswith("lsgkm-SVM") else 256
+    threads: 16
+    shell:
+        """
+        source activate {wildcards.model}
+        export CUDA_VISIBLE_DEVICES=0
+        if [ "{wildcards.model}" == "DeepBind" ]; then 
+            export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
+            export PATH=/usr/local/cuda-8.0/bin:$PATH
+            export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
+        fi
+        echo batch size: {params.batch_size}
+        echo model: {wildcards.model}
+        kipoi predict {params.model} \
+            --dataloader_args="{params.dl_kwargs}" \
+            --batch_size={params.batch_size} \
+            -n 16 \
+            -o {output.preds}
+        """
+
+rule benchmark_performance:
+    """Run model prediction"""
+    input:
+        env_bin = os.path.abspath(os.path.join(sys.executable, "../../envs/{model}/bin/kipoi"))
+        # TODO - add further file dependencies
+    output:
+        json_fname = DATA + "processed/tfbinding/eval/runtimes/{tf}/{model}.{batch_size}.json"
+    params:
+        def model(wildcards): return SINGLE_TASK_MODELS[wildcards.tf][wildcards.model],
+
+        def dl_kwargs(wildcards): return get_dl_kwargs(wildcards.tf)
+    threads: 16
+    shell:
+        """
+        source activate {wildcards.model}
+        export CUDA_VISIBLE_DEVICES=0
+        if [ "{wildcards.model}" == "DeepBind" ]; then 
+            export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
+            export PATH=/usr/local/cuda-8.0/bin:$PATH
+            export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
+        fi
+        python experiments/tfbinding/eval/benchmark_model.py  \
+            --model={params.model} \
+            --model_group={wildcards.model} \
+            --batch_size={wildcards.batch_size} \
+            --num_workers={threads} \
+            --num_runs=10 \
+            --tf={wildcards.tf} \
+            --output={output.json_fname}
+        """
+
+rule evaluate_models:
+    """Gather model predictions and compute auPRC"""
+    input:
+        preds = [DATA + "processed/tfbinding/eval/preds/{tf}/{model}.h5".format(tf=tf, model=model)
+                 for tf, value in SINGLE_TASK_MODELS.items()
+                 for model, model_name in value.items()
+                 if model_name is not None]
+    output:
+        csv = "data/processed/tfbinding/eval/metrics/all_models.chr8.csv"
+    run:
+        # Not boostrapped version
+        import pandas as pd
+        from joblib import Parallel, delayed
+        from m_kipoi.exp.tfbinding.eval import eval_model
+        from tqdm import tqdm
+        from m_kipoi.metrics import classification_metrics
+        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'DeepSEA', 'FactorNet']
+        df = pd.DataFrame(Parallel(n_jobs=32)(delayed(eval_model)(tf, model, classification_metrics,
+                                                                  filter_dnase=filter_dnase)
+                                              for model in tqdm(MODELS)
+                                              for tf in tqdm(TFS)
+                                              for filter_dnase in [True, False]))
+        # Make a nice column description
+        df['dataset'] = "Chromosome wide (chr8))"
+        df['dataset'][df.filter_dnase == True] = "Only accessible regions (chr8))"
+        df.to_csv(output.csv)
+
+
+rule plot:
+    """Create the plot"""
+    input:
+        csv = "data/processed/tfbinding/eval/metrics/all_models.chr8.csv"
+    output:
+        files = expand("data/processed/tfbinding/eval/plots/all_models.chr8.{fmt}",
+                       fmt=['pdf', 'png'])
+    run:
+        import matplotlib
+        matplotlib.use('Agg')
+        import pandas as pd
+        import seaborn as sns
+
+        sns.set_context("talk")
+        df = pd.read_csv(input.csv)
+        pallete = ['#8dd3c7', '#fdb462', '#bebada', '#fb8072', '#80b1d3']
+        df = df.rename(columns={"model": "Model"})
+        g = sns.factorplot(x="tf", y="auPR", hue="Model", data=df[~df.filter_dnase],
+                           size=5, kind="bar", palette=pallete)
+        # g.despine(left=True)
+        #plt.legend(loc='upper right', bbox_to_anchor=(1.4,1))
+        g.set_xlabels("Transcription Factor")
+        g.set_ylabels("auPRC")
+        for fname in output.files:
+            g.savefig(fname)
