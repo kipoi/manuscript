@@ -2,16 +2,6 @@
 Snakefile for the splicing model
 """
 
-# rule all:
-#     input:
-#         f"data/raw/clinvar/clinvar_{CLINVAR}.vcf.gz",  # Download the vcf file
-#         "data/processed/splicing/clinvar/clinvar_20180429.filtered.vcf.gz",  # filtered vcf
-#         expand("data/processed/splicing/clinvar/annotated_vcf/clinvar_{clinvar}.filtered/{model}.vcf",
-#                model=MODELS_FULL, clinvar=[CLINVAR]),
-#         "data/processed/splicing/clinvar/modeling_df.tsv",
-#         f"data/raw/splicing/spidex/hg19_spidex.clinvar_{CLINVAR}.txt",
-
-
 rule download_clinvar:
     output:
         vcf = "data/raw/splicing/clinvar/{clinvar_file}.vcf.gz",
@@ -32,7 +22,10 @@ rule clinvar_donor_acceptor:
     script:
         ROOT + "/src/splicing/generate_regions.R"
 
+
 rule filter_vcf:
+    """Restrict the variants only to the donor or acceptor sites
+    """
     input:
         vcf = "data/raw/splicing/clinvar/{clinvar_file}.vcf.gz",
         acceptors_num = "data/processed/splicing/clinvar/acceptors.numchr.bed",
@@ -50,37 +43,8 @@ rule filter_vcf:
         #awk '$1 ~ /^#/ {{print $0;next}} {{print $0 | "LC_ALL=C sort -k1,1 -k2,2n"}}' | \
         """
 
-
-# dl_kwargs = json.dumps({"gtf_file": os.path.abspath("data/raw/dataloader_files/shared/Homo_sapiens.GRCh37.75.filtered.gtf"),  #
-#                         "fasta_file": os.path.abspath("data/raw/dataloader_files/shared/hg19.fa")})
-
-# rule annotate_vcf:
-#     """Annotate the Vcf using Kipoi's score variants
-#     """
-#     input:
-#         vcf = "data/processed/splicing/clinvar/{clinvar_file}.filtered.vcf.gz",
-#         gtf = "data/raw/dataloader_files/shared/Homo_sapiens.GRCh37.75.filtered.gtf",
-#         fasta = "data/raw/dataloader_files/shared/hg19.fa"
-#     output:
-#         vcf = "data/processed/splicing/clinvar/annotated_vcf/{clinvar_file}.filtered/{model}.vcf"
-#     params:
-#         dl_kwargs = dl_kwargs,
-#     shell:
-#         """
-#         mkdir -p `dirname {output.vcf}`
-#         source activate kipoi-var-effect
-#         export CUDA_VISIBLE_DEVICES=1
-#         kipoi postproc score_variants {wildcards.model} \
-#             --dataloader_args='{params.dl_kwargs}' \
-#             -v $PWD/{input.vcf} \
-#             -n 10 \
-#             --out_vcf_fpath=$PWD/{output.vcf} \
-#             -s ref alt diff
-#         """
-
-
 rule intersect_spidex:
-    """Filters the spidex index to speedup dataloading
+    """Subset spidex to speedup dataloading
     """
     input:
         spidex = "data/raw/splicing/spidex/hg19_spidex.txt.gz",
@@ -93,7 +57,8 @@ rule intersect_spidex:
         """
 
 rule clinvar_gather:
-    """
+    """Gather model-annotated vcf's into a single table
+
     VEP annotated file: http://grch37.ensembl.org/Homo_sapiens/Tools/VEP/Ticket?tl=4iJskr0Rc1jxAf43
     """
     input:

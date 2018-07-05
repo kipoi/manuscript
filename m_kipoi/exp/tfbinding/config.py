@@ -4,7 +4,7 @@ DATA = "data/"
 HOLDOUT_CHR = 'chr8'
 
 
-FASTA=DATA+'raw/dataloader_files/shared/hg19.fa'
+FASTA = DATA + 'raw/dataloader_files/shared/hg19.fa'
 TF_C_pairs = [("CEBPB", "HeLa-S3"),
               ("JUND", "HepG2"),
               ("MAFK", "K562"),
@@ -25,11 +25,9 @@ SINGLE_TASK_MODELS = {
     "JUND": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/JUND",
         "DeepBind": "DeepBind/D00776.005",
-        "FactorNet": "FactorNet/JUND/meta_Unique35_DGF_2", # meta_Unique35_DGF_2
+        "FactorNet": "FactorNet/JUND/meta_Unique35_DGF_2",  # meta_Unique35_DGF_2
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Jund/Hepg2/Sydh_Iggrab",
-        # HACK - TODO make this code more general. Allow running multiple
-        # models for one TF
         "lsgkm-SVM2": "lsgkm-SVM/Tfbs/Jund/Hepg2/Haib_Pcr1x",
     },
     "MAFK": {
@@ -39,10 +37,10 @@ SINGLE_TASK_MODELS = {
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
     },
-    "NANOG": {        
+    "NANOG": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/NANOG",
         "DeepBind": "DeepBind/D00786.001",
-        "FactorNet": "FactorNet/NANOG/onePeak_Unique35_DGF", # GENCODE_Unique35_DGF
+        "FactorNet": "FactorNet/NANOG/onePeak_Unique35_DGF",  # GENCODE_Unique35_DGF
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
     }
@@ -53,19 +51,16 @@ SINGLE_TASK_MODELS = {
 def get_dl_kwargs(tf):
     """Returns the dataloader kwargs for each model"""
     cell_type = TF2CT[tf]
-    intervals = DATA+"raw/tfbinding/eval/intervals/" + \
-                "chr8_wide_bin101_flank0_stride101.{tf}.{ctype}.intervals_file.tsv".\
-                format(tf=tf, ctype=cell_type)
+    intervals = DATA + "raw/tfbinding/eval/intervals/" + \
+        "chr8_wide_bin101_flank0_stride101.{tf}.{ctype}.intervals_file.tsv".\
+        format(tf=tf, ctype=cell_type)
 
     # FactorNet DNASE
-    dnase = DATA+"raw/tfbinding/eval/DNASE/FactorNet/{ctype}.1x.bw".format(ctype=cell_type)
-
-    # Default DREAM challenge
-    # dnase = DATA+"raw/tfbinding/eval/DNASE/DNASE.{ctype}.fc.signal.bigwig".format(ctype=cell_type)
+    dnase = DATA + "raw/tfbinding/eval/DNASE/FactorNet/{ctype}.1x.bw".format(ctype=cell_type)
 
     return {"intervals_file": intervals,
             "dnase_file": dnase,
             "fasta_file": FASTA,
-	        "cell_line": cell_type,
+            "cell_line": cell_type,
             "use_linecache": True
             }

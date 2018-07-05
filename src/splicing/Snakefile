@@ -8,9 +8,6 @@ DATA = "data"
 
 CLINVAR = "20180429"  # clinvar dowload date
 
-# Which GPU to use
-GPU = 1
-
 from m_kipoi.config import list_models
 MODELS = ["MaxEntScan", "HAL", "labranchor"]
 MODELS_FULL = list_models(MODELS)
@@ -20,13 +17,18 @@ FASTA_FILE = "data/raw/dataloader_files/shared/hg19.fa"
 
 rule all:
     input:
-        # clinvar
-        f"data/processed/splicing/clinvar/annotated_vcf/{CLINVAR}.filtered/modeling_df.tsv",
-        f"data/raw/splicing/spidex/hg19_spidex.clinvar_{CLINVAR}.txt",
-	# dbscSNV
-	"data/raw/splicing/spidex/hg19_spidex.dbscSNV.txt",
-        "data/processed/splicing/dbscSNV/modeling_df.tsv",
-	"data/raw/splicing/dbscSNV/dbscSNV.chr1",
+        # ClinVar
+        # -------
+        f"data/processed/splicing/clinvar/annotated_vcf/{CLINVAR}.filtered/modeling_df.tsv",  # models
+        f"data/raw/splicing/spidex/hg19_spidex.clinvar_{CLINVAR}.txt",  # Spidex
+        "data/data/processed/splicing/clinvar/annotated_vcf/20180429.filtered/VEP.txt.gz",  # VEP (incl. dbscSNV)
+        #     Obtained from: http://grch37.ensembl.org/Homo_sapiens/Tools/VEP/Ticket?tl=4iJskr0Rc1jxAf43
+
+        # dbscSNV
+        # -------
+        "data/processed/splicing/dbscSNV/modeling_df.tsv",  # models
+        "data/raw/splicing/spidex/hg19_spidex.dbscSNV.txt",  # spidex
+        "data/raw/splicing/dbscSNV/dbscSNV.chr1",  # dbscSNV
 
 include:
     "download_annotation.smk"
