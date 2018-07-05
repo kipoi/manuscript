@@ -16,10 +16,9 @@ Research code for the kipoi manuscript
 
 ## Folder organization
 
-- m_kipoi - main python package folder for the kipoi manuscript (place for hosting functions that will get re-used throughout the analysis
+- m_kipoi - python package (contains python functions/classes common across multiple notebooks)
 - src - scripts for producing the figures
-
-
-## TODO
-
-- check if git lfs pull indeed works correctly
+  - tf-binding - Figure 2
+  - transfer_learnining - Figure 3
+  - veff+interpretation - Figure 4
+  - splicing - Figure 5
