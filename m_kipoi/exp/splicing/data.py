@@ -2,12 +2,11 @@ import pandas as pd
 import numpy as np
 import os
 import dask.dataframe as dd
-from m_kipoi.config import get_data_dir, memory
+from m_kipoi.config import get_data_dir
 from openpyxl import Workbook, load_workbook
 DATA = get_data_dir()
 
 
-@memory.cache
 def get_clinvar_ext_Xy(clinvar='20180429', keep_variants="^Pathogenic$|^Benign$"):
     """Load the clinvar data
 
@@ -43,7 +42,6 @@ def get_clinvar_ext_Xy(clinvar='20180429', keep_variants="^Pathogenic$|^Benign$"
         df[m + "_isna"] = df[m + "_ref"].isnull().astype(float)
 
     only_NA_rows = df[[m + "_diff" for m in splicing_models]].isnull().all(axis=1)
-    #print("Only NA fraction: {0}".format(df[[m + "_diff" for m in models]].isnull().all(axis=1).mean()))
 
     df = df[~only_NA_rows]
     df = df[~df.ClinicalSignificance.isnull()]
@@ -115,7 +113,6 @@ def get_dbscsnv_data():
     return df
 
 
-@memory.cache
 def get_dbscsnv_Xy():
     """Load the dbscSNV data with additional columns from kipoi models
     """

@@ -1,2 +1,14 @@
 data/processed/splicing/clinvar/annotated_vcf/20180429.filtered/VEP.txt.gz filter=lfs diff=lfs merge=lfs -text
 data/raw/splicing/dbscSNV/Supplementary_Table_S1-S6.xlsx filter=lfs diff=lfs merge=lfs -text
+data/processed filter=lfs diff=lfs merge=lfs -text
+data/raw filter=lfs diff=lfs merge=lfs -text
+data/envs filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/dbscSNV/modeling_df.tsv filter=lfs diff=lfs merge=lfs -text
+HEAD filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/clinvar/annotated_vcf/20180429.filtered/modeling_df.tsv filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/clinvar/annotated_vcf/20180429.filtered/clinvar_ext_Xy.pkl filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/dbscSNV/annotated_vcf/variants/dbscsnv_Xy.pkl filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/clinvar/20180429.filtered.vcf.gz filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/clinvar/20180429.filtered.vcf.gz.tbi filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/dbscSNV/variants.vcf.gz filter=lfs diff=lfs merge=lfs -text
+data/processed/splicing/dbscSNV/variants.vcf.gz.tbi filter=lfs diff=lfs merge=lfs -text
