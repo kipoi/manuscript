@@ -36,6 +36,15 @@ rule download_dbscsnv:
         rm gku1206_Supplementary_Data.zip
         """
 
+rule download_dbscsnv_scores:
+    output:
+        f = "data/raw/splicing/dbscSNV/dbscSNV.chr1",
+        z = temp("data/raw/splicing/dbscSNV/dbscSNV.zip")
+    shell:
+        """
+        wget ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbscSNV.zip
+        unzip dbscSNV.zip
+        """
 
 rule dbscsnv_xlsx2tsv:
     """extract the variant data from the excell sheet
@@ -73,80 +82,48 @@ rule dbscsnv2vcf:
         from collections import OrderedDict
 
         df = pd.read_csv(input.in_tsv, sep="\t")
-        # write the header
-        out_file = open(output.vcf, "w")
-        out_file.write(VCF_HEADER)
-        out_file.flush()
-        # write the tsv table
+        # Write the header
+        with open(output.vcf, "w") as f:
+            f.write(VCF_HEADER)
+
+        # Append the variants
+        variant_id = df.Chr.astype(str) + ":" + df.Position.astype(str) + ":" + df.Ref + ":['" + df.Alt + "']"
         pd.DataFrame(OrderedDict([("#CHROM", df.Chr.astype(str)),
                                   ("POS", df.Position),
-                                  ("ID", np.array(df.index)),
+                                  ("ID", variant_id),
                                   ("REF", df.Ref),
                                   ("ALT", df.Alt),
                                   ("QUAL", "."),
                                   ("FILTER", "."),
                                   ("INFO", "."),
-                                  ])).to_csv(out_file, index=False, sep="\t")
-        out_file.flush()
-        out_file.close()
+                                  ])).to_csv(output.vcf, mode='a', header=True, index=False, sep="\t")
 
 rule gzip_file:
+    """Tabix the vcf
+    """
     input:
         vcf = "data/processed/splicing/dbscSNV/variants.vcf"
     output:
         vcf_gz = "data/processed/splicing/dbscSNV/variants.vcf.gz",
     shell:
-        "gzip -c {input.vcf} > {output.vcf_gz}"
+        """
+        # Sort the vcf file
+        bgzip -c {input.vcf} > {output.vcf_gz}
+        tabix -f -p vcf {output.vcf_gz}
+        """
 
-# ------------------------------------------------------------------
-# Setup the environment
-
-# def mlist(w):
-#     return " ".join(ENVS[w.env])
-
-
-# rule create__env:
-#     """Create one conda environment for all splicing models"""
-#     output:
-#         env = os.path.abspath(os.path.join(sys.executable, "../../envs/{env}/bin/kipoi"))
-#     params:
-#         mlist = mlist
-#     shell:
-#         "kipoi env create {params.mlist} -e {wildcards.env} --gpu --vep"
-
-# rule export_env:
-#     """Create one conda environment for all splicing models"""
-#     output:
-#         env_file = 'data/envs/splicing/{env}.yml'
-#     params:
-#         # a list of models can be used for each environment
-#         # Kipoi can create environments for multiple models
-#         mlist = mlist
-#     shell:
-#         "kipoi env export {params.mlist} -e {wildcards.env} --gpu --vep -o {output.env_file}"
-
-
-# rule predict_models:
-#     input:
-#         # env=os.path.abspath(os.path.join(sys.executable, "../../envs/{env}/bin/kipoi"))
-#         input_vcf = "data/processed/splicing/dbscSNV/variants.vcf",
-#         splicing_gtf = "data/raw/dataloader_files/shared/Homo_sapiens.GRCh37.75.filtered.gtf",
-#         fasta_file = "data/raw/dataloader_files/shared/hg19.fa",
-#         env_file = 'data/envs/splicing/kipoi-var-effect.yml'
-#     output:
-#         out_vcf = "data/processed/splicing/dbscSNV/annotated_vcf/variants/{model}.vcf"
-#     # TODO - run using the CLI
-#     # conda:
-#     #     'data/envs/splicing/kipoi-var-effect.yml'
-#     run:
-#         from m_kipoi.exp.splicing.predict_splicing import predict_model
-#         predict_model(wildcards.model,
-#                       input.splicing_gtf,
-#                       input.fasta_file,
-#                       input.input_vcf,
-#                       output.out_vcf,
-#                       num_workers=0)
-
+rule intersect_spidex2:
+    """Filters the spidex index to speedup dataloading
+    """
+    input:
+        spidex = "data/raw/splicing/spidex/hg19_spidex.txt.gz",
+        vcf = "data/processed/splicing/dbscSNV/variants.vcf.gz"
+    output:
+        spidex = "data/raw/splicing/spidex/hg19_spidex.dbscSNV.txt"
+    shell:
+        """
+        bedtools intersect -a {input.spidex} -b {input.vcf} -header -sorted > {output.spidex}
+        """
 
 rule dbscsnv_gather:
     input:
@@ -161,7 +138,7 @@ rule dbscsnv_gather:
         dfg = gather_vcfs(MODELS_FULL, base_path="data/processed/splicing/dbscSNV/annotated_vcf/variants/models", ncores=16)
         #
         dfm = get_dbscsnv_data()
-        assert dfm.shape[0] == dfg.shape[0]
+        # assert dfm.shape[0] == dfg.shape[0]
 
         dfm['variant_id'] = dfm.Chr + ":" + dfm.Position.astype(str) + ":" + dfm.Ref + ":['" + dfm.Alt + "']"
 

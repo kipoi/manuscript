@@ -7,10 +7,6 @@
 1. Run `train-eval-KipoiSplice4.ipynb` in Jupyter-notebook
 
 
-
-
-
-
 ## TODO 
 
 - provide the annotated VCF files
@@ -38,6 +34,8 @@ from m_kipoi.exp.splicing.data import get_clinvar_ext_Xy, get_dbscsnv_Xy
 
 - [ ] implement the summarization functionality for the branchpoint  and then run the CLI using the same functions for dbscSNV and clinvar
   - discard `m_kipoi.exp.splicing.predict_splicing.predict_model`
+
+- TODO - make data/raw/splicing/dbscSNV/Supplementary_Table_S1-S6.xlsx part of the main repo
 
 
 ## Notes

@@ -37,5 +37,6 @@ rule annotate_vcf:
             -i $PWD/{input.vcf} \
             -n 10 \
             -o $PWD/{output.vcf} \
-            -s ref alt diff
+            -s ref alt logit_ref logit_alt diff \
+            --std_var_id
         """

@@ -106,3 +106,4 @@ ENV/
 slurm*out
 
 data/*
+src/splicing/plots/*

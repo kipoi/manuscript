@@ -19,17 +19,19 @@ def get_clinvar_ext_Xy(clinvar='20180429', keep_variants="^Pathogenic$|^Benign$"
         return chr.astype(str) + ":" + pos.astype(str) + ":" + ref + ":['" + alt + "']"
 
     ddir = get_data_dir()
-    df = pd.read_csv(f"{ddir}/processed/splicing/clinvar/annotated_vcf/clinvar_{clinvar}.filtered/modeling_df.tsv", sep='\t')
+    df = pd.read_csv(f"{ddir}/processed/splicing/clinvar/annotated_vcf/{clinvar}.filtered/modeling_df.tsv", sep='\t')
     # Keep only Kipoi annotations
     df = df.iloc[:, ~df.columns.str.startswith("other_")]
 
     # Append clinical significance
     from kipoi.postprocessing.variant_effects import KipoiVCFParser
-    vcf_file = f"{ddir}/processed/splicing/clinvar/clinvar_20180429.filtered.vcf.gz"
+    vcf_file = f"{ddir}/processed/splicing/clinvar/{clinvar}.filtered.vcf.gz"
     dfc = pd.DataFrame(list(KipoiVCFParser(vcf_file)))
     dfc['variant_id_old'] = dfc['variant_id']
     dfc['variant_id'] = variant_id(dfc.variant_chr, dfc.variant_pos, dfc.variant_ref, dfc.variant_alt)
     dfc['ClinicalSignificance'] = dfc['other_CLNSIG']
+    # import ipdb
+    # ipdb.set_trace()
     df = pd.merge(df, dfc[['variant_id', 'ClinicalSignificance']], on='variant_id', validate="many_to_one").drop_duplicates()
 
     # add the differences
@@ -48,7 +50,7 @@ def get_clinvar_ext_Xy(clinvar='20180429', keep_variants="^Pathogenic$|^Benign$"
     df = df[df.ClinicalSignificance.str.match(keep_variants)]
 
     # Append conservation scores and dbscSNV from VEP
-    df_vep = pd.read_csv(f"{ddir}/processed/splicing/clinvar/annotated_vcf/clinvar_{clinvar}.filtered/VEP.txt.gz",
+    df_vep = pd.read_csv(f"{ddir}/processed/splicing/clinvar/annotated_vcf/{clinvar}.filtered/VEP.txt.gz",
                          sep='\t', na_values='-')
     df_vep = df_vep.join(df_vep.Location.str.split(":|-", expand=True).rename(columns={0: "chr", 1: "start", 2: "end"}))
 

@@ -47,6 +47,7 @@ rule filter_vcf:
             bedtools intersect -a stdin -b {input.acceptors_num} {input.donors_num} -wa -u -header | \
             bgzip -c > {output.vcf}
         tabix -f -p vcf {output.vcf}
+        #awk '$1 ~ /^#/ {{print $0;next}} {{print $0 | "LC_ALL=C sort -k1,1 -k2,2n"}}' | \
         """
 
 
@@ -85,7 +86,7 @@ rule intersect_spidex:
         spidex = "data/raw/splicing/spidex/hg19_spidex.txt.gz",
         vcf = "data/processed/splicing/clinvar/{clinvar_file}.filtered.vcf.gz"
     output:
-        spidex = "data/raw/splicing/spidex/hg19_spidex.{clinvar_file}.txt"
+        spidex = "data/raw/splicing/spidex/hg19_spidex.clinvar_{clinvar_file}.txt"
     shell:
         """
         bedtools intersect -a {input.spidex} -b {input.vcf} -header -sorted > {output.spidex}

@@ -1,0 +1,2 @@
+data/processed/splicing/clinvar/annotated_vcf/20180429.filtered/VEP.txt.gz filter=lfs diff=lfs merge=lfs -text
+data/raw/splicing/dbscSNV/Supplementary_Table_S1-S6.xlsx filter=lfs diff=lfs merge=lfs -text

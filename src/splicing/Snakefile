@@ -23,8 +23,10 @@ rule all:
         # clinvar
         f"data/processed/splicing/clinvar/annotated_vcf/{CLINVAR}.filtered/modeling_df.tsv",
         f"data/raw/splicing/spidex/hg19_spidex.clinvar_{CLINVAR}.txt",
-        # dbscSNV
-        "data/processed/splicing/dbscSNV/modeling_df.tsv"
+	# dbscSNV
+	"data/raw/splicing/spidex/hg19_spidex.dbscSNV.txt",
+        "data/processed/splicing/dbscSNV/modeling_df.tsv",
+	"data/raw/splicing/dbscSNV/dbscSNV.chr1",
 
 include:
     "download_annotation.smk"
