@@ -2,8 +2,8 @@
 Snakefile for the splicing model
 """
 workdir:
-    "../../../"
-ROOT = "../../.."
+    "../../"
+ROOT = "../.."
 DATA = "data/"
 
 import sys
@@ -42,9 +42,7 @@ def get_env_executable(env):
 rule all:
     input:
         # Raw data
-        expand(DATA + "raw/tfbinding/eval/DNASE/DNASE.{ctype}.fc.signal.bigwig",
-               ctype=CELL_TYPES),
-        expand(DATA + "raw/tfbinding/eval/intervals/" +
+        expand(DATA + "raw/tfbinding/eval/tf-DREAM/" +
                "chr8_wide_bin101_flank0_stride101.{tf}.{ctype}.intervals_file.tsv.gz",
                zip, tf=TFS, ctype=CELL_TYPES),
         # FactorNet DNase
@@ -79,22 +77,6 @@ EVAL_FILES = ['chr8_wide_bin101_flank0_stride101.CEBPB.HeLa-S3.intervals_file.ts
               'chr8_wide_bin101_flank0_stride101.MAFK.K562.intervals_file.tsv.gz',
               'chr8_wide_bin101_flank0_stride101.NANOG.H1-hESC.intervals_file.tsv.gz']
 
-rule get_intervals:
-    """Gets the intervals data for evaluation
-    """
-    output:
-        expand(DATA + "raw/tfbinding/eval/intervals/{f}", f=EVAL_FILES)
-    shell:
-        "rsync -a 'nandi:/srv/scratch/manyu/kipoi/manuscript_code/experiments/tfbinding/interval_files/chr8_*' data/raw/tfbinding/eval/intervals/"
-
-rule rename_JUND:
-    input:
-        DATA + "raw/tfbinding/eval/intervals/chr8_wide_bin101_flank0_stride101.HepG2.JUND.intervals_file.tsv.gz"
-    output:
-        DATA + "raw/tfbinding/eval/intervals/chr8_wide_bin101_flank0_stride101.JUND.HepG2.intervals_file.tsv.gz"
-    shell:
-        "mv {input} {output}"
-
 
 synapse_DNASE = {
     "HeLa-S3": "syn8073618",
@@ -108,7 +90,7 @@ rule get_DNase_data_factornet:
     output:
         dnase = DATA + "raw/tfbinding/eval/DNASE/FactorNet/{ctype}.1x.bw"
     params:
-        syn = lambda w: return synapse_DNASE[w.ctype]
+        syn = lambda w: synapse_DNASE[w.ctype]
     shell:
         "Synapse get {params.syn} --downloadLocation $(dirname {output.dnase})"
 
@@ -119,9 +101,9 @@ rule create_conda_env:
     output:
         env = os.path.abspath(os.path.join(sys.executable, "../../envs/{env}/bin/kipoi"))
     params:
-        env_name = lambda w: return ENVIRONMENTS[w.env]
+        env_name = lambda w: ENVIRONMENTS[w.env]
     shell:
-        "kipoi env create {params.env_name} -e {wildcards.env} --gpu"
+        "kipoi env create {params.env_name} -e {wildcards.env}"  # Add --gpu to leverage the GPU
 
 # --------------------------------------------
 # Evaluate the models
@@ -166,8 +148,7 @@ rule measure_execution_time:
     output:
         json_fname = DATA + "processed/tfbinding/eval/runtimes/{tf}/{model}.{batch_size}.json"
     params:
-        model = labmda w: SINGLE_TASK_MODELS[w.tf][w.model],
-
+        model = lambda w: SINGLE_TASK_MODELS[w.tf][w.model],
         dl_kwargs = lambda w: get_dl_kwargs(w.tf)
     threads: 16
     shell:

@@ -51,7 +51,7 @@ SINGLE_TASK_MODELS = {
 def get_dl_kwargs(tf):
     """Returns the dataloader kwargs for each model"""
     cell_type = TF2CT[tf]
-    intervals = DATA + "raw/tfbinding/eval/intervals/" + \
+    intervals = DATA + "raw/tfbinding/eval/tf-DREAM/" + \
         "chr8_wide_bin101_flank0_stride101.{tf}.{ctype}.intervals_file.tsv".\
         format(tf=tf, ctype=cell_type)
 
