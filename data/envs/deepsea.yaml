@@ -1,0 +1,28 @@
+dependencies:
+- deepdish
+- pybigwig
+- pybedtools
+- pyvcf
+- cyvcf2
+- bedtools
+- htslib
+- h5py
+- pytorch>=0.2.0
+- pybedtools
+- python=3.5
+- numpy
+- pandas
+- cython
+- pip:
+  - shapely
+  - descartes
+  - matplotlib
+  - seaborn
+  - intervaltree
+  - kipoi
+  - pyfaidx
+channels:
+- defaults
+- pytorch
+- bioconda
+- conda-forge
