@@ -31,7 +31,6 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/JUND/meta_Unique35_DGF_2",  # meta_Unique35_DGF_2
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Jund/Hepg2/Sydh_Iggrab",
-        "lsgkm-SVM2": "lsgkm-SVM/Tfbs/Jund/Hepg2/Haib_Pcr1x",
     },
     "MAFK": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/MAFK",

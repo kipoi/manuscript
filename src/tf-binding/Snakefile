@@ -31,7 +31,6 @@ ENVIRONMENTS = {
     "DeepBind": "DeepBind/D00317.009",
     "FactorNet": "FactorNet/JUND/meta_Unique35_DGF",
     "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
-    "lsgkm-SVM2": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
 }
 
 # --------------------------------------------
@@ -110,7 +109,7 @@ rule get_DNase_data_factornet:
     params:
         syn = lambda w: synapse_DNASE[w.ctype]
     shell:
-        "Synapse get {params.syn} --downloadLocation $(dirname {output.dnase})"
+        "synapse get {params.syn} --downloadLocation $(dirname {output.dnase})"
 
 # --------------------------------------------
 # Setup the environment
@@ -162,8 +161,10 @@ rule measure_execution_time:
     """Measure model prediction time
     """
     input:
-        env_bin = get_env_executable("{model}")
-        # TODO - add further file dependencies
+        env_bin = get_env_executable("{model}"),
+        intervals = lambda w: get_dl_kwargs(w.tf)['intervals_file'],
+        fasta = lambda w: get_dl_kwargs(w.tf)['fasta_file'],
+        dnase_file = lambda w: get_dl_kwargs(w.tf)['dnase_file'],
     output:
         json_fname = DATA + "processed/tfbinding/eval/runtimes/{tf}/{model}.{batch_size}.json"
     params:

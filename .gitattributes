@@ -12,3 +12,8 @@ data/processed/splicing/clinvar/20180429.filtered.vcf.gz filter=lfs diff=lfs mer
 data/processed/splicing/clinvar/20180429.filtered.vcf.gz.tbi filter=lfs diff=lfs merge=lfs -text
 data/processed/splicing/dbscSNV/variants.vcf.gz filter=lfs diff=lfs merge=lfs -text
 data/processed/splicing/dbscSNV/variants.vcf.gz.tbi filter=lfs diff=lfs merge=lfs -text
+models/Divergent421/example_files/intervals_files_ENCSR000EMT_chr21_10000.tsv filter=lfs diff=lfs merge=lfs -text
+models/Divergent421/model_files/model.arch.json filter=lfs diff=lfs merge=lfs -text
+models/Divergent421/model_files/model.weights.h5 filter=lfs diff=lfs merge=lfs -text
+models/Divergent421/example_files/chr21.fa filter=lfs diff=lfs merge=lfs -text
+models/Divergent421/example_files/chr21.fa.fai filter=lfs diff=lfs merge=lfs -text

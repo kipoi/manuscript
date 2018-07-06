@@ -96,7 +96,7 @@ if "threads" in job_properties:
 #     arg_dict["partition"] = "normal"
 
 opt_keys = ["array", "account", "begin", "cpus_per_task",
-            "depedency", "workdir", "error", "job_name", "mail_type",
+            "depedency", "workdir", "error", "job-name", "mail_type",
             "mail_user", "ntasks", "nodes", "output", "partition",
             "quiet", "time", "wrap", "constraint", "mem", "exclude"]
 opts = ""
