@@ -1,0 +1,86 @@
+HG19_PATH = "data/raw/dataloader_files/shared/hg19.fa"
+VCF_CONTENT="""##fileformat=VCFv4.0
+##contig=<ID=chr11,length=135006516>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr11	5246970	chr11:5246970:A:C	A	C	.	.	."""
+
+MODEL_NAME_DICT = {'pwm':'pwm_HOCOMOCO/human/GATA1', 'lsgkm':'lsgkm-SVM/Tfbs/Gata1/Pbde/Sydh_Ucd',
+'deepbind': 'DeepBind/D00765.001', 'deepsea':'DeepSEA/variantEffects'}
+CLINVAR_VCF = "data/raw/mutation_map/ClinVar/clinvar_20180603.vcf.gz"
+
+MODEL_OUTPUT_DICT = {'pwm':'0',
+  'lsgkm': '0',
+  'deepbind':'0',
+  'deepsea':'K562_GATA-1_None_622'}
+
+
+VCF_PATH = "data/raw/mutation_map/ClinVar/sample.vcf"
+
+
+def create_dirs(file_path):
+    import os
+    dir_path = "/".join(file_path.split("/")[:-1])
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+
+rule all:
+    input:
+        CLINVAR_VCF,
+        VCF_PATH,
+        expand("data/processed/mutation_map/computed/{model}.hdf5", model=MODEL_NAME_DICT.keys()),
+        expand("data/processed/mutation_map/computed/{model}.png", model=MODEL_NAME_DICT.keys())
+
+
+rule write_vcf:
+    output:
+        VCF_PATH
+    run:
+        create_dirs(VCF_PATH)
+        with open(VCF_PATH, "w") as ofh:
+            ofh.write(VCF_CONTENT)
+            ofh.write("\n")
+
+
+rule calculate_mutation_map:
+    input:
+        VCF_PATH,
+        HG19_PATH
+    output:
+        out_hdf5 ="data/processed/mutation_map/computed/{model}.hdf5"
+    conda:
+        "data/envs/{model}.yaml"
+    params:
+        model_name = lambda wildcards, output: MODEL_NAME_DICT[wildcards.model],
+        dataloader_args = lambda wildcards, output: '{\'fasta_file\':\''+HG19_PATH+'\'}',
+        regions_file = VCF_PATH,
+        seqlen_param = lambda wildcards, output: "--seq_length  101 " if "pwm" in wildcards.model or "lsgkm" in wildcards.model else ""
+    shell:
+        "kipoi postproc create_mutation_map {params.model_name} --source kipoi --batch_size 32 --dataloader_args \"{params.dataloader_args}\" --regions_file {params.regions_file} --output {output.out_hdf5} {params.seqlen_param}"
+
+rule plot_mutation_map:
+    input:
+        "data/processed/mutation_map/computed/{model}.hdf5"
+    output:
+        "data/processed/mutation_map/computed/{model}.png"
+    conda:
+        "data/envs/{model}.yaml"
+    params:
+        model_output = lambda wildcards, output: MODEL_OUTPUT_DICT[wildcards.model]
+    shell:
+        "kipoi postproc plot_mutation_map --input_file={input} --input_entry=0 --model_seq_input=seq --scoring_key=diff --model_output={params.model_output} --limit_region_genomic 5246940 5247000 --output {output} "
+
+
+rule download_clinvar:
+    output:
+        CLINVAR_VCF
+    run:
+        create_dirs(CLINVAR_VCF)
+        command = """
+        wget ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2018/clinvar_20180603.vcf.gz -O {clinvar_vcf}
+        wget ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2018/clinvar_20180603.vcf.gz.tbi -O {clinvar_vcf_idx}
+        """.format(clinvar_vcf = CLINVAR_VCF, clinvar_vcf_idx = CLINVAR_VCF + ".tbi")
+        assert os.system(command) == 0
+
+
+
