@@ -3,8 +3,11 @@
 DATA = "data/"
 HOLDOUT_CHR = 'chr8'
 
+ANNO = DATA + "raw/dataloader_files/shared"
+NUM_FASTA_FILE = f"{ANNO}/hg19.fa"
+CHR_FASTA_FILE = f"{ANNO}/hg19.w-chr.fa"
 
-FASTA = DATA + 'raw/dataloader_files/shared/hg19.fa'
+# FASTA = DATA + 'raw/dataloader_files/shared/hg19.fa'
 TF_C_pairs = [("CEBPB", "HeLa-S3"),
               ("JUND", "HepG2"),
               ("MAFK", "K562"),
@@ -60,7 +63,7 @@ def get_dl_kwargs(tf):
 
     return {"intervals_file": intervals,
             "dnase_file": dnase,
-            "fasta_file": FASTA,
+            "fasta_file": CHR_FASTA_FILE,
             "cell_line": cell_type,
             "use_linecache": True
             }

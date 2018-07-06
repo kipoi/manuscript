@@ -19,7 +19,9 @@ from glob import glob
 
 # --------------------------------------------
 # Config
-from m_kipoi.exp.tfbinding.config import (DATA, FASTA, TF_C_pairs, TFS, CELL_TYPES,
+from m_kipoi.utils import get_env_executable
+from m_kipoi.exp.tfbinding.config import (DATA, TF_C_pairs, TFS, CELL_TYPES,
+                                          NUM_FASTA_FILE, CHR_FASTA_FILE,
                                           HOLDOUT_CHR, TF2CT, SINGLE_TASK_MODELS, get_dl_kwargs)
 
 # TODO - fix this - use a single name for the model
@@ -33,11 +35,6 @@ ENVIRONMENTS = {
 }
 
 # --------------------------------------------
-
-
-def get_env_executable(env):
-    return os.path.abspath(os.path.join(sys.executable, "../../envs/{env}/bin/kipoi".format(env=env)))
-
 
 rule all:
     input:
@@ -69,6 +66,18 @@ rule all:
                fmt=['pdf', 'png'])
 
 
+rule fasta_numchr2chr:
+    """Create a chr<N> based fasta file
+    """
+    input:
+        f = NUM_FASTA_FILE
+    output:
+        f = CHR_FASTA_FILE
+    shell:
+        """
+	cat {input.f} | sed 's/^>/>chr/g' > {output.f}
+        """
+        
 # --------------------------------------------
 # Get all the evaluation data
 
@@ -85,6 +94,15 @@ synapse_DNASE = {
     "H1-hESC": "syn8073583",
 }
 
+
+rule unzip_tsv:
+    input:
+        f = DATA + "raw/tfbinding/eval/tf-DREAM/chr8_wide_bin101_flank0_stride101.{tf}.{ctype}.intervals_file.tsv.gz"
+    output:
+        f = DATA + "raw/tfbinding/eval/tf-DREAM/chr8_wide_bin101_flank0_stride101.{tf}.{ctype}.intervals_file.tsv"
+    shell:
+        "zcat {input.f} > '{output.f}"
+
 rule get_DNase_data_factornet:
     """Get the DNase datasets for factornet"""
     output:
@@ -99,7 +117,7 @@ rule get_DNase_data_factornet:
 rule create_conda_env:
     """Create one conda environment per model"""
     output:
-        env = os.path.abspath(os.path.join(sys.executable, "../../envs/{env}/bin/kipoi"))
+        env = get_env_executable("{env}")
     params:
         env_name = lambda w: ENVIRONMENTS[w.env]
     shell:
@@ -110,8 +128,10 @@ rule create_conda_env:
 rule predict:
     """Run model prediction"""
     input:
-        env_bin = os.path.abspath(os.path.join(sys.executable, "../../envs/{model}/bin/kipoi"))
-        # TODO - add further file dependencies
+        kipoi = get_env_executable("{model}"),
+        intervals = lambda w: get_dl_kwargs(w.tf)['intervals_file'],
+        fasta = lambda w: get_dl_kwargs(w.tf)['fasta_file'],
+        dnase_file = lambda w: get_dl_kwargs(w.tf)['dnase_file'],
     output:
         preds = DATA + "processed/tfbinding/eval/preds/{tf}/{model}.h5"
     params:
@@ -123,16 +143,15 @@ rule predict:
     threads: 16
     shell:
         """
-        source activate {wildcards.model}
-        export CUDA_VISIBLE_DEVICES=0
-        if [ "{wildcards.model}" == "DeepBind" ]; then 
-            export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
-            export PATH=/usr/local/cuda-8.0/bin:$PATH
-            export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
-        fi
+        # export CUDA_VISIBLE_DEVICES=0
+        # if [ "{wildcards.model}" == "DeepBind" ]; then 
+        #     export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
+        #     export PATH=/usr/local/cuda-8.0/bin:$PATH
+        #     export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
+        # fi
         echo batch size: {params.batch_size}
         echo model: {wildcards.model}
-        kipoi predict {params.model} \
+        {input.kipoi} predict {params.model} \
             --dataloader_args="{params.dl_kwargs}" \
             --batch_size={params.batch_size} \
             -n 16 \
@@ -143,7 +162,7 @@ rule measure_execution_time:
     """Measure model prediction time
     """
     input:
-        env_bin = os.path.abspath(os.path.join(sys.executable, "../../envs/{model}/bin/kipoi"))
+        env_bin = get_env_executable("{model}")
         # TODO - add further file dependencies
     output:
         json_fname = DATA + "processed/tfbinding/eval/runtimes/{tf}/{model}.{batch_size}.json"
@@ -154,15 +173,16 @@ rule measure_execution_time:
     shell:
         """
         source activate {wildcards.model}
-        export CUDA_VISIBLE_DEVICES=0
-        if [ "{wildcards.model}" == "DeepBind" ]; then 
-            export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
-            export PATH=/usr/local/cuda-8.0/bin:$PATH
-            export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
-        fi
-        python experiments/tfbinding/eval/execution_time.py  \
+        # export CUDA_VISIBLE_DEVICES=0
+        # if [ "{wildcards.model}" == "DeepBind" ]; then 
+        #     export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
+        #     export PATH=/usr/local/cuda-8.0/bin:$PATH
+        #     export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
+        # fi
+        python src/tf-binding/execution_time.py  \
             --model={params.model} \
             --model_group={wildcards.model} \
+            --dl_kwargs="{params.dl_kwargs}" \
             --batch_size={wildcards.batch_size} \
             --num_workers={threads} \
             --num_runs=10 \
