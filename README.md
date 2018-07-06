@@ -1,6 +1,6 @@
 # manuscript_code
 
-Research code for the kipoi manuscript
+Research code for the Kipoi manuscript
 
 
 ## Installation

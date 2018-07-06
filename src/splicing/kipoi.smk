@@ -30,7 +30,6 @@ rule annotate_vcf:
     shell:
         """
         mkdir -p `dirname {output.vcf}`
-        # export CUDA_VISIBLE_DEVICES={GPU}
         {input.kipoi} postproc score_variants \
             {wildcards.model} \
             --dataloader_args='{params.dl_kwargs}' \
