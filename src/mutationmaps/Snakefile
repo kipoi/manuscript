@@ -1,3 +1,11 @@
+"""
+Snakefile for mutation maps example
+"""
+
+workdir:
+    "../../"
+ROOT = "../.."
+
 HG19_PATH = "data/raw/dataloader_files/shared/hg19.fa"
 VCF_CONTENT="""##fileformat=VCFv4.0
 ##contig=<ID=chr11,length=135006516>
