@@ -127,12 +127,12 @@ if __name__ == '__main__':
                                                                        batch_size=args.batch_size,
                                                                        num_workers=args.num_workers),
                               nb_val_samples=len(dl_eval),
-                              nb_epoch=2)
+                              nb_epoch=100)
     duration = time.time() - start_time
     print("Total duration: {}".format(duration))
 
     metrics = {"duration": duration,
                "gpu": gpu,
                "num_workers": args.num_workers,
-               "batch_size": batch_size}
+               "batch_size": args.batch_size}
     (odir / "stats.json").write_text(json.dumps(metrics))
