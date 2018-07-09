@@ -1,6 +1,4 @@
 
-
-
 ## Training models
 
 ### Randomly initialized
@@ -43,3 +41,12 @@
     - intervals_file
     - fasta_file
   - valid_dl_kwargs
+
+
+## Installation
+
+```bash
+kipoi env create models/Divergent421 -n kipoi-divergent421
+source activate kipoi-divergent421
+pip install snakemake concise
+```

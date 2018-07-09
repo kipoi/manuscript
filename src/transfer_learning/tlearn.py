@@ -131,8 +131,11 @@ if __name__ == '__main__':
     duration = time.time() - start_time
     print("Total duration: {}".format(duration))
 
-    metrics = {"duration": duration,
-               "gpu": gpu,
-               "num_workers": args.num_workers,
-               "batch_size": args.batch_size}
-    (odir / "stats.json").write_text(json.dumps(metrics))
+    try:
+        metrics = {"duration": float(duration),
+                   "gpu": int(gpu),
+                   "num_workers": int(args.num_workers),
+                   "batch_size": int(args.batch_size)}
+        (odir / "stats.json").write_text(json.dumps(metrics))
+    except:
+        print("Failed to write {} to the file".format(metrics))

@@ -12,13 +12,25 @@ all_labels = pd.Series(read_txt("data/raw/tlearn/metadata/all_tasks.txt"))
 eval_labels = read_txt("data/raw/tlearn/metadata/eval_tasks.txt")
 
 
+tasks, epochs, = glob_wildcards("data/processed/tlearn/models/transferred/{task}/weights.{epochs}.hdf5")
+
+# TODO - get the best epoch and run it for the test-st 
+
 rule all:
     input:
+        # training data 
         expand("data/processed/tlearn/data/{split}/{task}/interval_labels.tsv.gz",
                split=['train', 'valid', 'test'],
                task=eval_labels),
+        # trained model
         expand("data/processed/tlearn/models/transferred/{task}/weights.01.hdf5",
-               task=eval_labels)
+               task=eval_labels),
+        # model evaluation (validation set)
+        expand("data/processed/tlearn/models/transferred/{task}/eval/valid/epoch-{epoch}.metrics.json",
+               zip,
+               task=tasks,
+               epoch=epochs)
+
 
 # --------------------------------------------
 grep_regex = {
@@ -76,3 +88,23 @@ rule train_model:
           -n 8 \
           -p 1
         """
+
+rule evaluate_model:
+    input:
+        intervals = "data/processed/tlearn/data/{split}/{task}/interval_labels.tsv.gz",
+        model = "data/processed/tlearn/models/transferred/{task}/weights.{epoch}.hdf5",
+        fasta = "data/raw/dataloader_files/shared/hg19.fa",
+    output:
+        metrics = "data/processed/tlearn/models/transferred/{task}/eval/{split}/epoch-{epoch}.metrics.json",
+    shell:
+        """
+        python src/transfer_learning/eval_validation.py \
+          --model='{input.model}' \
+          --dataloader=models/Divergent421 --dataloader_source=dir \
+          --intervals_file='{input.intervals}' \
+          --fasta_file='{input.fasta}' \
+          -o '{output.metrics}' \
+          --batch_size=128 \
+          -n 8
+        """
+        
