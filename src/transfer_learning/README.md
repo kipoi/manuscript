@@ -1,52 +1,28 @@
+## Reproducing the results
 
-## Training models
-
-### Randomly initialized
-
-- get the model architecture from the existing model (from Kipoi) and re-train it
-   - OR use it directly from TF-dragonn
-
-
-### Transferred model
-
-- get_model("Divergent")
-- change the last layer
-- re-train the model
-  - save weights
-  - save metrics (train and validation)
+1. Install the conda environment: 
+  - `kipoi env create ../../models/Divergent421 -n kipoi-divergent`
+1. Activate the package and install the remaining packages:
+  - `source activate kipoi-divergent`
+  - `pip install -e ../../`
+  - `pip install snakemake concise`
+1. Run `snakemake train`
+1. Run `snakemake evaluate`
+1. Evaluate all cells in `plot.ipynb`
 
 
-### Evaluate model
+## File description
 
-- take each model and evaluate it
-  - Use Kipoi (?) to do so
+- `tlearn.py` - script to perform transfer-learning given a Kipoi model and a dataloader
+- `Snakefile` - Snakemake file for transfer-learning model training and evaluation
+- `plot.ipynb` - Jupyter notebook plotting the results
+- `eval_validation.py` - script to evaluate a trained model
+- `eval_metrics.py` - required evaluation metrics
 
+## Provided data
 
-
-## TODO
-
-- [x] Split the whole datasets into train,valid,test and also into different tasks
-  - Use Snakemake to do so
-- [x] re-write a new dataloader which adopts to the number of output features (bed3 + features)
-- [ ] tlearn.py
-  - model
-  - lr
-  - patience
-  - eval_metrics
-  - early_stop_metric
-  - freeze_to=layer
-  - transfer_to=layer
-  - add_n_hidden='[]'  # number of hidden layers to add
-  - train_dl_kwargs (adopt to the new dataset)
-    - intervals_file
-    - fasta_file
-  - valid_dl_kwargs
-
-
-## Installation
-
-```bash
-kipoi env create models/Divergent421 -n kipoi-divergent421
-source activate kipoi-divergent421
-pip install snakemake concise
-```
+- `data/raw/tlearn/intervals_files_complete.tsv.gz` - intervals and DNA accessibility labels for 431 different cell types/tissues
+- `data/raw/tlearn/metadata/all_tasks.txt` - columns-names for the labels (ENCODE ID's)
+- `data/raw/tlearn/metadata/eval_tasks.txt` - columns for which to evaluate the model (ENCODE ID's)
+- `data/raw/tlearn/metadata/anno.csv` - mapping between the ENCODE ID and the Cell_Type for the evaluated tasks
+- `data/processed/tlearn/models/random/{split}/{encode_id}/tfdragonn.log` - gathered test and validation logs using tf-dragonn for randomly initialied model

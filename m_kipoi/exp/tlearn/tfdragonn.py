@@ -46,7 +46,7 @@ def parse_log(path):
     if len(epochs) == 0 and len(auROCs) > 0:
         epochs = [None] * len(auROCs)
 
-    return pd.DataFrame.from_items([("path", path),
+    dfo = pd.DataFrame.from_items([("path", path),
                                     ("epoch", epochs),
                                     ("best_epoch", best_epoch),
                                     ("balanced_accuracy", balanced_accuracies),
@@ -61,3 +61,7 @@ def parse_log(path):
                                     ("arch_file", arch_file),
                                     ("weights_file", weights_file),
                                     ])
+    if best_epoch is None:
+        dfo['best_epoch'] = dfo.iloc[dfo.auPRC.argmax()].epoch
+    return dfo
+    

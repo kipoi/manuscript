@@ -17,3 +17,8 @@ models/Divergent421/model_files/model.arch.json filter=lfs diff=lfs merge=lfs -t
 models/Divergent421/model_files/model.weights.h5 filter=lfs diff=lfs merge=lfs -text
 models/Divergent421/example_files/chr21.fa filter=lfs diff=lfs merge=lfs -text
 models/Divergent421/example_files/chr21.fa.fai filter=lfs diff=lfs merge=lfs -text
+data/processed/tlearn/models/random/** filter=lfs diff=lfs merge=lfs -text
+data/raw/tlearn/metadata/anno.csv filter=lfs diff=lfs merge=lfs -text
+data/raw/tlearn/intervals_files_complete.tsv.gz filter=lfs diff=lfs merge=lfs -text
+data/raw/tlearn/metadata/all_tasks.txt filter=lfs diff=lfs merge=lfs -text
+data/raw/tlearn/metadata/eval_tasks.txt filter=lfs diff=lfs merge=lfs -text

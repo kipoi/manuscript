@@ -18,6 +18,7 @@ def auprc(y_true, y_pred):
     precision, recall, _ = skm.precision_recall_curve(y_true, y_pred)
     return skm.auc(recall, precision)
 
+
 def accuracy(y_true, y_pred, round=True):
     """Classification accuracy
     """

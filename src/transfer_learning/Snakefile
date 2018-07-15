@@ -1,17 +1,121 @@
+"""Setup the data for transfer-learning
+"""
 workdir:
     "../../"
-ROOT = "../../"
-DATA = "data/"
+from kipoi.utils import read_txt
+import pandas as pd
+
+valid_chr = ['chr1', 'chr8', 'chr21']
+test_chr = ['chr9']
+
+all_labels = pd.Series(read_txt("data/raw/tlearn/metadata/all_tasks.txt"))
+eval_labels = read_txt("data/raw/tlearn/metadata/eval_tasks.txt")
 
 
-rule all:
+tasks, epochs, = glob_wildcards("data/processed/tlearn/models/transferred/{task}/weights.{epochs}.hdf5")
+
+# optimal epochs
+dfl = pd.DataFrame({"task": tasks, "epoch": epochs})
+dfl['epoch'] = dfl.epoch.astype(int)
+dfl = (dfl.groupby('task').epoch.max() - 1).reset_index()
+
+
+rule train:
     input:
-        DATA + "raw/tlearn/experiments.tsv"
+        # training data 
+        expand("data/processed/tlearn/data/{split}/{task}/interval_labels.tsv.gz",
+               split=['train', 'valid', 'test'],
+               task=eval_labels),
+        # trained model
+        expand("data/processed/tlearn/models/transferred/{task}/weights.01.hdf5",
+               task=eval_labels),
 
-rule download_experiments:
+rule evaluate:
+    input:
+        # model evaluation (validation set)
+        expand("data/processed/tlearn/models/transferred/{task}/eval/valid/epoch-{epoch}.metrics.json",
+               zip,
+               task=tasks,
+               epoch=epochs),
+        expand("data/processed/tlearn/models/transferred/{task}/eval/test/epoch-{epoch}.metrics.json",
+               zip,
+               task=dfl['task'].tolist(),
+               epoch=dfl['epoch'].astype(str).str.zfill(2).tolist())
+
+
+# --------------------------------------------
+grep_regex = {
+    "train": "-vwE " + "'^" + "|^".join(valid_chr + test_chr) + "'",
+    "valid": "-wE " + "'^" + "|^".join(valid_chr) + "'",
+    "test": "-wE " + "'^" + "|^".join(test_chr) + "'",
+}
+
+rule data_split:
+    """Split the data w.r.t train, validation and test as well as by task
+    """
+    input:
+        f = "data/raw/tlearn/intervals_files_complete.tsv.gz"
     output:
-        tsv=DATA + "raw/tlearn/experiments.tsv"
+        f = "data/processed/tlearn/data/{split}/{task}/interval_labels.tsv.gz"
+    params:
+        regex_str = lambda w: grep_regex[w.split],
+        col_id = lambda w: str(4 + all_labels.index[all_labels == w.task][0])
     shell:
         """
-        wget --header="Host: docs.google.com" --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36" --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" --header="Accept-Language: en-US,en;q=0.9,de-DE;q=0.8,de;q=0.7,sl;q=0.6" --header="Cookie: S=apps-spreadsheets=uXVitwXcc-LlRw26HjEBP_kJ3ur96syR; CONSENT=YES+DE.en+20151206-18-0; HSID=Ayoa7cYrh4_cqamOy; SSID=AxJvHdGCF4iowhT1D; APISID=DHx5MXSPPKKcPaG4/AKyNWGNkh2UNDgP0t; SAPISID=YZCJVwKfuLc_M8QM/AHdjhg1Yb_9Tjn40w; SID=AwaCiFwHWfKEag0pAggmnrrXZHAEQx-gsrksJzuXXmbtkKTv4vZO1uOQI4doXtqQDz6geg.; S=explorer=tc4x765CfRurkDqdaHnf-VWCmvUgOivU; NID=129=kiXI-KtDCl24dlxur2UXkTFX5A3uCzhkzxdRMTNNdFkr92MyqrJ87cjEX1VUpO0zwJJwLAMa1HAQVwvq_wtIDait33XTZDCV-8gIfcRIKtQqIFcqhkcFPWrkR9F8RwOPPQxTHVnT7PilVrsasBvt_Q1zRSoZMiDKMXcvDGn6rDBimpd7jNA6a8NB1neenXalCAkv5OIK0QvawOX8i6BlX7hM6cM_5EkQ88WH2piAuPnS96i0gwwWo8SPL10yRgIoZ5WY0QQxwwJh_NjBr4ryZ7LB0OeDgx3aczvFW3e8f65kvFtZLEXcNL3Oi6j_lL-efCbEZ8XRdCVg-k-M7AlDKKpb4Z6Io7UKvNCvX0_dSxQKVnlcYujNl1A; 1P_JAR=2018-4-28-1; SIDCC=AEfoLebSfueTjSSttY0z1kVUkEL7T7nDyiOQ-REiO86JcZXv62ZtfuhevKs8RJVe7WrAjKsQ32M" --header="Connection: keep-alive" "https://docs.google.com/spreadsheets/u/2/d/1UVfXq6R9dzpEajjXpn8X_SoTdMAi6onKGB12Zk8JGIY/export?format=tsv&id=1UVfXq6R9dzpEajjXpn8X_SoTdMAi6onKGB12Zk8JGIY&gid=0" -O {output.tsv} -c 
+        zcat {input.f} | \
+          grep {params.regex_str} | \
+          cut -f1,2,3,{params.col_id} | \
+          gzip -c > '{output.f}'
         """
+
+# TODO - train the model
+rule train_model:
+    input:
+        train = "data/processed/tlearn/data/train/{task}/interval_labels.tsv.gz",
+        valid = "data/processed/tlearn/data/valid/{task}/interval_labels.tsv.gz",
+        fasta = "data/raw/dataloader_files/shared/hg19.fa",
+    output:
+        model = "data/processed/tlearn/models/transferred/{task}/weights.01.hdf5",
+        history = "data/processed/tlearn/models/transferred/{task}/history.csv"
+    params:
+        dl_kwargs_train = lambda w, input, output: json.dumps({"intervals_file": input.train,
+                                                    "fasta_file": input.fasta, 
+                                                    "num_chr_fasta": True}),
+        dl_kwargs_eval = lambda w, input, output: json.dumps({"intervals_file": input.valid,
+                                                   "fasta_file": input.fasta,
+                                                   "num_chr_fasta": True}),
+        outdir = lambda w, output: os.path.dirname(output.model)
+    shell:
+        """
+        python src/transfer_learning/tlearn.py \
+          models/Divergent421 --source=dir \
+          --dl_kwargs_train='{params.dl_kwargs_train}' \
+          --dl_kwargs_eval='{params.dl_kwargs_eval}' \
+          -t 1 \
+          -o '{params.outdir}' \
+          --transfer_to=prelu_5 \
+          --freeze_to=dense_2 \
+          --batch_size=128 \
+          -n 8 \
+          -p 1
+        """
+
+rule evaluate_model:
+    input:
+        intervals = "data/processed/tlearn/data/{split}/{task}/interval_labels.tsv.gz",
+        model = "data/processed/tlearn/models/transferred/{task}/weights.{epoch}.hdf5",
+        fasta = "data/raw/dataloader_files/shared/hg19.fa",
+    output:
+        metrics = "data/processed/tlearn/models/transferred/{task}/eval/{split}/epoch-{epoch}.metrics.json",
+    shell:
+        """
+        python src/transfer_learning/eval_validation.py \
+          --model='{input.model}' \
+          --dataloader=models/Divergent421 --dataloader_source=dir \
+          --intervals_file='{input.intervals}' \
+          --fasta_file='{input.fasta}' \
+          -o '{output.metrics}' \
+          --batch_size=128 \
+          -n 8
+        """
+        

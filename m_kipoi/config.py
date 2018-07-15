@@ -75,3 +75,9 @@ def create_tf_session(visiblegpus, per_process_gpu_memory_fraction=0.45):
     session = tf.Session(config=session_config)
     K.set_session(session)
     return session
+
+
+def setup_matplotlib():
+    import matplotlib
+    matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['ps.fonttype'] = 42
