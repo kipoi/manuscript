@@ -1,5 +1,6 @@
 ## Reproducing the results
 
+1. Make sure you have run the `snakemake` file from `src/splicing` to download the annotation GTF and FASTA files (see also `src/splicing/download_annotation.smk`)
 1. Install the conda environment: 
   - `kipoi env create ../../models/Divergent421 -n kipoi-divergent`
 1. Activate the package and install the remaining packages:

@@ -1,41 +1,18 @@
-- setup the whole evaluation in one snakefile: `experiments/tfbinding/Snakefile`
-  - similar to: https://github.com/kipoi/manuscript_code/blob/master/Snakefile#L111-L183
+## Reproducing the results
 
-## Snakemake rules
+1. Make sure you have run the `snakemake` file from `src/splicing` to download the annotation GTF and FASTA files (see also `src/splicing/download_annotation.smk`)
+1. Activate the conda environment for this repository (see [../../README.md](../../README.md) for more information)
+  - `source activate kipoi-manuscript`
+1. Run the whole pipeline: `snakemake`
+  - final plots will be located at: `data/processed/tfbinding/eval/plots/all_models.chr8.pdf`
 
-- download evaluation data
-- create conda env
-- predict
-  - simply runs `kipoi predict` for each model
-   - make sure `use_linecache` is enabled
-   - enable compression of the hdf5 file
-- evaluate
-  - runs the evaluation for each model and outputs
-     -  bootstraped table as a csv file. Metrics:
-       - auprc, recall at fdr x, auROC, accuracy, num_positive, num_negative
-     - single-lined csv file with only a single evaluation
-- plot
-  - gathers the multiple csv files and plots the results
+## File description
 
-## Evaluation files
+- `execution_time.py` - script to measure the execution time of a model
+- `Snakefile` - Snakemake file running the entire pipeline
 
-- see: https://github.com/kipoi/manuscript_code/tree/master/experiments/tfbinding/interval_specs
-  - `<TF>.<cell_line>.testing.json`
+## Provided data
 
-## Deepsea example
-
-```bash
-#!/bin/bash
-
-intervals_file='/srv/scratch/manyu/kipoi/manuscript_code/experiments/tfbinding/interval_files/chr8_wide_bin101_flan\
-k0_stride101_slop_l450_r449.CEBPB.HeLa-S3.intervals_file.tsv'
-genome_file='/srv/scratch/genomelake_data/hg19.genome.fa'
-#echo '{"intervals_file": "'$intervals_file'", "fasta_file": "'$genome_file'"}'
-kipoi predict DeepSEA/predict \
-  --dataloader='dataloaders/genomelake/ArrayExtractorSeq_Dataset' \
-  --dataloader_source=kipoi \
-  --dataloader_args='{"intervals_file": "'$intervals_file'", "genome_file": "'$genome_file'","use_linecache":True}' \
-  --batch_size=512 \
-  -n 16 \
-  -o 'predictions/DeepSEA_predict.h5'
-```
+- in folder:`data/raw/tfbinding/eval/tf-DREAM`
+  - `DNASE.<cell_type>.relaxed.narrowPeak.gz` - Set of DNASE peaks from the tf-DREAM challenge
+  - `chr8_wide_bin101_flank0_stride101.<TF>.<cell_type>.intervals_file.tsv.gz` - bed3 file with an additional column denoting 1-overlaps a ChIP-seq peak, 0=doesn't overlap a ChIP-seq peak

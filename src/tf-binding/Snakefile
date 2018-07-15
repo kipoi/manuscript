@@ -26,7 +26,7 @@ from m_kipoi.exp.tfbinding.config import (DATA, TF_C_pairs, TFS, CELL_TYPES,
                                           NUM_FASTA_FILE, CHR_FASTA_FILE,
                                           HOLDOUT_CHR, TF2CT, SINGLE_TASK_MODELS, get_dl_kwargs)
 
-# TODO - fix this - use a single name for the model
+# in the new API, we could also use a single name for the model
 ENVIRONMENTS = {
     "DeepSEA": "DeepSEA/predict",
     "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/CEBPB",

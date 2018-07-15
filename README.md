@@ -17,8 +17,8 @@ Research code for the Kipoi manuscript
 ## Folder organization
 
 - m_kipoi - python package (contains python functions/classes common across multiple notebooks)
-- src - scripts for producing the figures
+- src - scripts for running the experiments and producing the figures
   - tf-binding - Figure 2
   - transfer_learnining - Figure 3
-  - veff+interpretation - Figure 4
+  - mutationmaps - Figure 4
   - splicing - Figure 5
