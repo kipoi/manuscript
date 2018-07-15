@@ -88,7 +88,7 @@ rule train_model:
     shell:
         """
         python src/transfer_learning/tlearn.py \
-          models/Divergent421 --source=dir \
+          Divergent421 --source=kipoi \
           --dl_kwargs_train='{params.dl_kwargs_train}' \
           --dl_kwargs_eval='{params.dl_kwargs_eval}' \
           -t 1 \
@@ -111,7 +111,7 @@ rule evaluate_model:
         """
         python src/transfer_learning/eval_validation.py \
           --model='{input.model}' \
-          --dataloader=models/Divergent421 --dataloader_source=dir \
+          --dataloader=Divergent421 --dataloader_source=kipoi \
           --intervals_file='{input.intervals}' \
           --fasta_file='{input.fasta}' \
           -o '{output.metrics}' \
