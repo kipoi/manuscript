@@ -22,3 +22,6 @@ Research code for the Kipoi manuscript
   - `transfer_learnining` - Figure 3
   - `mutationmaps` - Figure 4
   - `splicing` - Figure 5
+- `data` - data files
+- `models/Divergent421` - (optional) Pre-trained DNA accessibility model (Kipoi format)
+- `slurm` - (optional) SLURM profile for snakemake <https://github.com/Snakemake-Profiles/slurm>
