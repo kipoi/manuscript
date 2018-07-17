@@ -30,7 +30,7 @@ from m_kipoi.exp.tfbinding.config import (DATA, TF_C_pairs, TFS, CELL_TYPES,
 ENVIRONMENTS = {
     "DeepSEA": "DeepSEA/predict",
     "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/CEBPB",
-    "DeepBind": "DeepBind/D00317.009",
+    "DeepBind": "DeepBind/Homo_sapiens/TF/D00317.009_ChIP-seq_CEBPB",
     "FactorNet": "FactorNet/JUND/meta_Unique35_DGF",
     "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
 }
@@ -226,8 +226,10 @@ rule plot:
     input:
         csv = "data/processed/tfbinding/eval/metrics/all_models.chr8.csv"
     output:
-        files = expand("data/processed/tfbinding/eval/plots/all_models.chr8.{fmt}",
-                       fmt=['pdf', 'png'])
+        files_all = expand("data/processed/tfbinding/eval/plots/all_models.chr8.{fmt}",
+                           fmt=['pdf', 'png']),
+        files_dnase = expand("data/processed/tfbinding/eval/plots/all_models.chr8.DNASE-peaks.{fmt}",
+                             fmt=['pdf', 'png'])
     run:
         import matplotlib
         matplotlib.use('Agg')
@@ -240,11 +242,23 @@ rule plot:
         df = pd.read_csv(input.csv)
         pallete = ['#8dd3c7', '#fdb462', '#bebada', '#fb8072', '#80b1d3']
         df = df.rename(columns={"model": "Model"})
+        
+        # filter_dnase=False
         g = sns.factorplot(x="tf", y="auPR", hue="Model", data=df[~df.filter_dnase],
                            size=5, kind="bar", palette=pallete)
         # g.despine(left=True)
         #plt.legend(loc='upper right', bbox_to_anchor=(1.4,1))
         g.set_xlabels("Transcription Factor")
         g.set_ylabels("auPRC")
-        for fname in output.files:
+        for fname in output.files_all:
+            g.savefig(fname)
+            
+        # filter_dnase=True
+        g = sns.factorplot(x="tf", y="auPR", hue="Model", data=df[df.filter_dnase],
+                           size=5, kind="bar", palette=pallete)
+        # g.despine(left=True)
+        #plt.legend(loc='upper right', bbox_to_anchor=(1.4,1))
+        g.set_xlabels("Transcription Factor")
+        g.set_ylabels("auPRC")
+        for fname in output.files_dnase:
             g.savefig(fname)
