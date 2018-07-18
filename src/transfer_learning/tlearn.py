@@ -11,6 +11,7 @@ from kipoi.cli.parser_utils import add_model, add_dataloader
 from keras.models import Sequential, Model
 from kipoi.utils import parse_json_file_str
 import keras.layers as kl
+from keras.optimizers import Adam
 from keras.callbacks import CSVLogger, EarlyStopping, ModelCheckpoint
 import GPUtil
 
@@ -40,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('--add_n_hidden', default="", type=str,
                         help='Comma separated list of hidden layers to add')
     parser.add_argument('--batch_size', default=32, type=int, help='Number of transferred tasks')
-
+    parser.add_argument('--lr', default=0.001, type=float, help='Learning rate')
     parser.add_argument("-n", "--num_workers", type=int, default=0,
                         help="Number of parallel workers for loading the dataset")
     parser.add_argument('-p', '--patience', default=10, type=int, help='Early stopping patience')
@@ -107,7 +108,7 @@ if __name__ == '__main__':
                                input_shape=tmodel.output_shape[1:]))
 
     final_model = Sequential([tmodel, top_model])
-    final_model.compile("adam", "binary_crossentropy")
+    final_model.compile(Adam(args.lr), "binary_crossentropy")
     # ---------------
     dl_train.batch_train_iter(cycle=True, shuffle=True, batch_size=args.batch_size, num_workers=args.num_workers)
 
