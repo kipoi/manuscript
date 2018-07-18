@@ -68,8 +68,9 @@ rule data_split:
           gzip -c > '{output.f}'
         """
 
-# TODO - train the model
 rule train_model:
+    """Train a new model using transfer-learning
+    """
     input:
         train = "data/processed/tlearn/data/train/{task}/interval_labels.tsv.gz",
         valid = "data/processed/tlearn/data/valid/{task}/interval_labels.tsv.gz",
