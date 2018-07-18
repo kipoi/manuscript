@@ -96,7 +96,8 @@ rule train_model:
           -o '{params.outdir}' \
           --transfer_to=prelu_5 \
           --freeze_to=dense_2 \
-          --batch_size=128 \
+          --batch_size=256 \
+          --lr=0.0003 \
           -n 8 \
           -p 1
         """
@@ -117,6 +118,5 @@ rule evaluate_model:
           --fasta_file='{input.fasta}' \
           -o '{output.metrics}' \
           --batch_size=256 \
-          --lr=0.0003 \
           -n 8
         """
