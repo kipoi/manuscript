@@ -26,4 +26,4 @@
 - `data/raw/tlearn/metadata/all_tasks.txt` - columns-names for the labels (ENCODE ID's)
 - `data/raw/tlearn/metadata/eval_tasks.txt` - columns for which to evaluate the model (ENCODE ID's)
 - `data/raw/tlearn/metadata/anno.csv` - mapping between the ENCODE ID and the Cell_Type for the evaluated tasks
-- `data/processed/tlearn/models/random/{split}/{encode_id}/tfdragonn.log` - gathered test and validation logs using tf-dragonn for randomly initialied model
+- `data/processed/tlearn/models/random/{split}/{encode_id}/tfdragonn.log` - gathered test and validation logs using tf-dragonn for randomly initialized model
