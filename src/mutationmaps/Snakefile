@@ -4,7 +4,7 @@ Snakefile for mutation maps example
 
 workdir:
     "../../"
-ROOT = "../.."
+ROOT = "../../"
 
 HG19_PATH = "data/raw/dataloader_files/shared/hg19.fa"
 VCF_CONTENT="""##fileformat=VCFv4.0
@@ -13,7 +13,7 @@ VCF_CONTENT="""##fileformat=VCFv4.0
 chr11	5246970	chr11:5246970:A:C	A	C	.	.	."""
 
 MODEL_NAME_DICT = {'pwm':'pwm_HOCOMOCO/human/GATA1', 'lsgkm':'lsgkm-SVM/Tfbs/Gata1/Pbde/Sydh_Ucd',
-'deepbind': 'DeepBind/D00765.001', 'deepsea':'DeepSEA/variantEffects'}
+'deepbind': 'DeepBind/Homo_sapiens/TF/D00765.001_ChIP-seq_GATA1', 'deepsea':'DeepSEA/variantEffects'}
 CLINVAR_VCF = "data/raw/mutation_map/ClinVar/clinvar_20180603.vcf.gz"
 
 MODEL_OUTPUT_DICT = {'pwm':'0',
@@ -34,6 +34,7 @@ def create_dirs(file_path):
 
 rule all:
     input:
+        expand("data/envs/{model}.yaml", model=MODEL_NAME_DICT.keys()),
         CLINVAR_VCF,
         VCF_PATH,
         expand("data/processed/mutation_map/computed/{model}.hdf5", model=MODEL_NAME_DICT.keys()),
@@ -49,6 +50,14 @@ rule write_vcf:
             ofh.write(VCF_CONTENT)
             ofh.write("\n")
 
+rule make_model_env:
+    output:
+        "data/envs/{model}.yaml"
+    params:
+        model_name = lambda wildcards, output: MODEL_NAME_DICT[wildcards.model]
+    shell:
+        "kipoi env export --vep {params.model_name} -o {output}"  # Add --gpu to leverage the GPU
+
 
 rule calculate_mutation_map:
     input:
@@ -57,14 +66,14 @@ rule calculate_mutation_map:
     output:
         out_hdf5 ="data/processed/mutation_map/computed/{model}.hdf5"
     conda:
-        "data/envs/{model}.yaml"
+        ROOT + "data/envs/{model}.yaml"
     params:
         model_name = lambda wildcards, output: MODEL_NAME_DICT[wildcards.model],
         dataloader_args = lambda wildcards, output: '{\'fasta_file\':\''+HG19_PATH+'\'}',
         regions_file = VCF_PATH,
         seqlen_param = lambda wildcards, output: "--seq_length  101 " if "pwm" in wildcards.model or "lsgkm" in wildcards.model else ""
     shell:
-        "kipoi postproc create_mutation_map {params.model_name} --source kipoi --batch_size 32 --dataloader_args \"{params.dataloader_args}\" --regions_file {params.regions_file} --output {output.out_hdf5} {params.seqlen_param}"
+        "kipoi-veff create_mutation_map {params.model_name} --source kipoi --batch_size 32 --dataloader_args \"{params.dataloader_args}\" --regions_file {params.regions_file} --output {output.out_hdf5} {params.seqlen_param}"
 
 rule plot_mutation_map:
     input:
@@ -72,11 +81,11 @@ rule plot_mutation_map:
     output:
         "data/processed/mutation_map/computed/{model}.png"
     conda:
-        "data/envs/{model}.yaml"
+        ROOT + "data/envs/{model}.yaml"
     params:
         model_output = lambda wildcards, output: MODEL_OUTPUT_DICT[wildcards.model]
     shell:
-        "kipoi postproc plot_mutation_map --input_file={input} --input_entry=0 --model_seq_input=seq --scoring_key=diff --model_output={params.model_output} --limit_region_genomic 5246940 5247000 --output {output} "
+        "kipoi-veff plot_mutation_map --input_file={input} --input_entry=0 --model_seq_input=seq --scoring_key=diff --model_output={params.model_output} --limit_region_genomic 5246940 5247000 --output {output} "
 
 
 rule download_clinvar:
