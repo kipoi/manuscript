@@ -115,7 +115,7 @@ rule evaluate_model:
           --intervals_file='{input.intervals}' \
           --fasta_file='{input.fasta}' \
           -o '{output.metrics}' \
-          --batch_size=128 \
+          --batch_size=256 \
+          --lr=0.0003 \
           -n 8
         """
-        
