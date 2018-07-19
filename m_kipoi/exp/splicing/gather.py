@@ -4,7 +4,7 @@ from collections import OrderedDict
 from glob import glob
 import pandas as pd
 import numpy as np
-from kipoi.postprocessing.variant_effects import KipoiVCFParser
+from kipoi_veff.parsers import KipoiVCFParser
 
 
 def refmt_col(col, model_name, col_types):

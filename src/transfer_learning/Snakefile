@@ -68,8 +68,9 @@ rule data_split:
           gzip -c > '{output.f}'
         """
 
-# TODO - train the model
 rule train_model:
+    """Train a new model using transfer-learning
+    """
     input:
         train = "data/processed/tlearn/data/train/{task}/interval_labels.tsv.gz",
         valid = "data/processed/tlearn/data/valid/{task}/interval_labels.tsv.gz",
@@ -95,7 +96,8 @@ rule train_model:
           -o '{params.outdir}' \
           --transfer_to=prelu_5 \
           --freeze_to=dense_2 \
-          --batch_size=128 \
+          --batch_size=256 \
+          --lr=0.0003 \
           -n 8 \
           -p 1
         """
@@ -116,6 +118,5 @@ rule evaluate_model:
           --fasta_file='{input.fasta}' \
           -o '{output.metrics}' \
           --batch_size=256 \
-          --lr=0.0003 \
           -n 8
         """

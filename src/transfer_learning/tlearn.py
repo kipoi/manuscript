@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """Script for transfer learning
+
+Should work with any Kipoi model of `type: keras`
 """
 import json
 import time
