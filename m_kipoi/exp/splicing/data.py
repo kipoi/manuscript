@@ -23,7 +23,7 @@ def get_clinvar_ext_Xy(clinvar='20180429', keep_variants="^Pathogenic$|^Benign$"
     df = df.iloc[:, ~df.columns.str.startswith("other_")]
 
     # Append clinical significance
-    from kipoi.postprocessing.variant_effects import KipoiVCFParser
+    from kipoi_veff.parsers import KipoiVCFParser
     vcf_file = f"{ddir}/processed/splicing/clinvar/{clinvar}.filtered.vcf.gz"
     dfc = pd.DataFrame(list(KipoiVCFParser(vcf_file)))
     dfc['variant_id_old'] = dfc['variant_id']

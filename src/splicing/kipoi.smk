@@ -30,7 +30,7 @@ rule annotate_vcf:
     shell:
         """
         mkdir -p `dirname {output.vcf}`
-        {input.kipoi} postproc score_variants \
+        {input.kipoi} veff score_variants \
             {wildcards.model} \
             --dataloader_args='{params.dl_kwargs}' \
             -i $PWD/{input.vcf} \

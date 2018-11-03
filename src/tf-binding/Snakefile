@@ -24,7 +24,8 @@ from glob import glob
 from m_kipoi.utils import get_env_executable
 from m_kipoi.exp.tfbinding.config import (DATA, TF_C_pairs, TFS, CELL_TYPES,
                                           NUM_FASTA_FILE, CHR_FASTA_FILE,
-                                          HOLDOUT_CHR, TF2CT, SINGLE_TASK_MODELS, get_dl_kwargs)
+                                          HOLDOUT_CHR, TF2CT, SINGLE_TASK_MODELS,
+                                          get_dl_kwargs)
 
 # in the new API, we could also use a single name for the model
 ENVIRONMENTS = {
@@ -76,9 +77,9 @@ rule fasta_numchr2chr:
         f = CHR_FASTA_FILE
     shell:
         """
-	cat {input.f} | sed 's/^>/>chr/g' > {output.f}
+        cat {input.f} | sed 's/^>/>chr/g' > {output.f}
         """
-        
+
 # --------------------------------------------
 # Get all the evaluation data
 
@@ -144,12 +145,6 @@ rule predict:
     threads: 16
     shell:
         """
-        # export CUDA_VISIBLE_DEVICES=0
-        # if [ "{wildcards.model}" == "DeepBind" ]; then 
-        #     export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
-        #     export PATH=/usr/local/cuda-8.0/bin:$PATH
-        #     export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
-        # fi
         echo batch size: {params.batch_size}
         echo model: {wildcards.model}
         {input.kipoi} predict {params.model} \
@@ -176,12 +171,6 @@ rule measure_execution_time:
     shell:
         """
         source activate {wildcards.model}
-        # export CUDA_VISIBLE_DEVICES=0
-        # if [ "{wildcards.model}" == "DeepBind" ]; then 
-        #     export LD_LIBRARY_PATH=/usr/local/cudnn-6.0/lib64/:$LD_LIBRARY_PATH
-        #     export PATH=/usr/local/cuda-8.0/bin:$PATH
-        #     export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
-        # fi
         python src/tf-binding/execution_time.py  \
             --model={params.model} \
             --model_group={wildcards.model} \
@@ -203,7 +192,6 @@ rule evaluate_models:
     output:
         csv = "data/processed/tfbinding/eval/metrics/all_models.chr8.csv"
     run:
-        # Not boostrapped version
         import pandas as pd
         from joblib import Parallel, delayed
         from m_kipoi.exp.tfbinding.eval import eval_model
@@ -242,22 +230,18 @@ rule plot:
         df = pd.read_csv(input.csv)
         pallete = ['#8dd3c7', '#fdb462', '#bebada', '#fb8072', '#80b1d3']
         df = df.rename(columns={"model": "Model"})
-        
+
         # filter_dnase=False
         g = sns.factorplot(x="tf", y="auPR", hue="Model", data=df[~df.filter_dnase],
                            size=5, kind="bar", palette=pallete)
-        # g.despine(left=True)
-        #plt.legend(loc='upper right', bbox_to_anchor=(1.4,1))
         g.set_xlabels("Transcription Factor")
         g.set_ylabels("auPRC")
         for fname in output.files_all:
             g.savefig(fname)
-            
+
         # filter_dnase=True
         g = sns.factorplot(x="tf", y="auPR", hue="Model", data=df[df.filter_dnase],
                            size=5, kind="bar", palette=pallete)
-        # g.despine(left=True)
-        #plt.legend(loc='upper right', bbox_to_anchor=(1.4,1))
         g.set_xlabels("Transcription Factor")
         g.set_ylabels("auPRC")
         for fname in output.files_dnase:
