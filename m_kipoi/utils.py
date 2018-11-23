@@ -60,5 +60,7 @@ def get_env_executable(env):
     """Returns a path to the kipoi exectuable
     """
     py_bin = os.environ.get("CONDA_PYTHON_EXE")
+    if not py_bin:
+        py_bin = sys.executable
     # sys.executable
     return os.path.abspath(os.path.join(py_bin, "../../envs/{env}/bin/kipoi".format(env=env)))
