@@ -1,4 +1,4 @@
-name: kipoi-manuscript
+name: kipoi-manuscript-tlearn-gpu
 channels:
 - bioconda
 - conda-forge
@@ -9,23 +9,13 @@ dependencies:
 - numpy
 - pandas
 - scipy
-# Bioconda
-- vcftools
-- pybedtools
-- cyvcf2
-# R packages
-- r-data.table
-- bioconductor-txdb.hsapiens.ucsc.hg19.knowngene
-- r-magrittr
-- bioconductor-rtracklayer
 - pip:
   - kipoi==0.6.2
   - kipoiseq==0.2.2
-  - kipoi_veff==0.1.0
   - deepdish
   - snakemake
-  - keras
-  - tensorflow
+  - keras==1.2.2
+  - tensorflow-gpu==1.5.0
   - tqdm
   - scikit-learn
   - bcolz
@@ -34,5 +24,4 @@ dependencies:
   - ipykernel
   - plotnine
   - sklearn-pandas
-
-# TODO - add library versions to it  
+  - gputil
