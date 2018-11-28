@@ -53,17 +53,20 @@ if __name__ == '__main__':
     create_tf_session(gpu)
 
     model = load_model(args.model)
+    
     # Get the dataloader
-    Dl = kipoi.get_dataloader_factory(args.dataloader, args.dataloader_source)
+    # Dl = kipoi.get_dataloader_factory(args.dataloader, args.dataloader_source)
+    Dl = kipoi.get_model(args.dataloader, args.dataloader_source).default_dataloader
     dl = Dl(intervals_file=args.intervals_file,
             fasta_file=args.fasta_file,
+            ignore_targets=False,
             num_chr_fasta=True)
 
     metric_fns = {"auprc": auprc,
                   "auc": auc,
                   "accuracy": accuracy}
     
-    y_true = dl.tsv.df[3].values
+    y_true = dl.seq_dl.bed.df[3].values
     y_pred = numpy_collate_concat([model.predict_on_batch(x['inputs'])
                                    for x in tqdm(dl.batch_iter(batch_size=args.batch_size,
                                                                num_workers=args.num_workers))])
