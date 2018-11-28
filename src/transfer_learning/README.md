@@ -10,6 +10,7 @@
 1. Run `snakemake train`
 1. Run `snakemake evaluate`
 1. Evaluate all cells in `plot.ipynb`
+1. Evaluate all cells in `pre-computed-tlearn.ipynb`
 
 
 ## File description
@@ -17,6 +18,7 @@
 - `tlearn.py` - script to perform transfer-learning given a Kipoi model and a dataloader
 - `Snakefile` - Snakemake file for transfer-learning model training and evaluation
 - `plot.ipynb` - Jupyter notebook plotting the results
+- `pre-computed-tlearn.ipynb` - Jupyter notebook showing how to train the transferred model from Figure 3 by pre-computing the activations.
 - `eval_validation.py` - script to evaluate a trained model
 - `eval_metrics.py` - required evaluation metrics
 
