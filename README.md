@@ -37,6 +37,7 @@ Code accompanying the Kipoi manuscript
       - Function to get the `kipoi` binary given the conda environment name: [get_env_executable](https://github.com/kipoi/manuscript/blob/master/m_kipoi/utils.py#L59-L64)
 - Fig 3 - Transfer learning: 
   - Script for performing transfer-learning using a Keras-based model from Kipoi: [tlearn.py](https://github.com/kipoi/manuscript/blob/master/src/transfer_learning/tlearn.py)
+  - Pre-computing the activations of the frozen part of the network and then training the model [pre-computed-tlearn.ipynb](https://github.com/kipoi/manuscript/blob/master/src/transfer_learning/pre-computed-tlearn.ipynb)
 - Fig 4 - Plugins (variant effect prediction and interpretation)
   - Generic rule for variant effect prediction (CLI) used for building KipoiSplice/4 (relevant for Fig. 4 and Fig. 5):
     - [create_env](https://github.com/kipoi/manuscript/blob/master/src/splicing/kipoi.smk#L8-L14)
