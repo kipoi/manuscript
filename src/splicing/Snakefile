@@ -30,6 +30,12 @@ rule all:
         "data/raw/splicing/spidex/hg19_spidex.dbscSNV.txt",  # spidex
         "data/raw/splicing/dbscSNV/dbscSNV.chr1",  # dbscSNV
 
+        
+rule download_annotations:
+    input:
+        GTF_FILE,
+        FASTA_FILE
+        
 include:
     "download_annotation.smk"
 include:
