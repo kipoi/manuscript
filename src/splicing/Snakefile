@@ -21,7 +21,7 @@ rule all:
         # -------
         f"data/processed/splicing/clinvar/annotated_vcf/{CLINVAR}.filtered/modeling_df.tsv",  # models
         f"data/raw/splicing/spidex/hg19_spidex.clinvar_{CLINVAR}.txt",  # Spidex
-        "data/data/processed/splicing/clinvar/annotated_vcf/20180429.filtered/VEP.txt.gz",  # VEP (incl. dbscSNV)
+        "data/processed/splicing/clinvar/annotated_vcf/20180429.filtered/VEP.txt.gz",  # VEP (incl. dbscSNV)
         #     Obtained from: http://grch37.ensembl.org/Homo_sapiens/Tools/VEP/Ticket?tl=4iJskr0Rc1jxAf43
 
         # dbscSNV
