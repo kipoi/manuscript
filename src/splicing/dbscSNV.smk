@@ -98,6 +98,8 @@ rule download_dbscsnv_scores:
         z = temp("data/raw/splicing/dbscSNV/dbscSNV.zip")
     shell:
         """
+        # Note, if this doesn't work then manually download the file from
+        # https://drive.google.com/uc?id=0B60wROKy6OqcZkw2bWt2TGU5NDA&export=download
         wget ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbscSNV.zip
         unzip dbscSNV.zip
         """
