@@ -34,8 +34,17 @@ ENVIRONMENTS = {
     "DeepBind": "DeepBind/Homo_sapiens/TF/D00317.009_ChIP-seq_CEBPB",
     "FactorNet": "FactorNet/JUND/meta_Unique35_DGF",
     "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
+    "lsgkm-SVM-1kb": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
 }
 
+ENVIRONMENT_NAMES = {
+    "DeepSEA": "DeepSEA",
+    "pwm_HOCOMOCO": "pwm_HOCOMOCO",
+    "DeepBind": "DeepBind",
+    "FactorNet": "FactorNet",
+    "lsgkm-SVM": "lsgkm-SVM",
+    "lsgkm-SVM-1kb": "lsgkm-SVM",
+}
 # --------------------------------------------
 
 rule all:
@@ -130,7 +139,7 @@ rule create_conda_env:
 rule predict:
     """Run model prediction"""
     input:
-        kipoi = get_env_executable("{model}"),
+        kipoi = lambda w: get_env_executable(ENVIRONMENT_NAMES[w.model]),
         intervals = lambda w: get_dl_kwargs(w.tf)['intervals_file'],
         fasta = lambda w: get_dl_kwargs(w.tf)['fasta_file'],
         dnase_file = lambda w: get_dl_kwargs(w.tf)['dnase_file'],
@@ -166,11 +175,12 @@ rule measure_execution_time:
         json_fname = DATA + "processed/tfbinding/eval/runtimes/{tf}/{model}.{batch_size}.json"
     params:
         model = lambda w: SINGLE_TASK_MODELS[w.tf][w.model],
-        dl_kwargs = lambda w: get_dl_kwargs(w.tf)
+        dl_kwargs = lambda w: get_dl_kwargs(w.tf),
+        env_name = lambda w: ENVIRONMENT_NAMES[w.model]
     threads: 16
     shell:
         """
-        source activate {wildcards.model}
+        source activate {args.env_name}
         python src/tf-binding/execution_time.py  \
             --model={params.model} \
             --model_group={wildcards.model} \
@@ -197,7 +207,7 @@ rule evaluate_models:
         from m_kipoi.exp.tfbinding.eval import eval_model
         from tqdm import tqdm
         from m_kipoi.metrics import classification_metrics
-        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'DeepSEA', 'FactorNet']
+        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'DeepSEA', 'FactorNet']
         df = pd.DataFrame(Parallel(n_jobs=32)(delayed(eval_model)(tf, model, classification_metrics,
                                                                   filter_dnase=filter_dnase)
                                               for model in tqdm(MODELS)

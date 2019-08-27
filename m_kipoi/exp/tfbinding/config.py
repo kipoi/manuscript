@@ -24,6 +24,7 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/CEBPB/meta_Unique35_DGF",
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
+        "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
     },
     "JUND": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/JUND",
@@ -31,6 +32,7 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/JUND/meta_Unique35_DGF_2",  # meta_Unique35_DGF_2
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Jund/Hepg2/Sydh_Iggrab",
+        "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
     },
     "MAFK": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/MAFK",
@@ -38,6 +40,7 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/MAFK/meta_1_Unique35_DGF",
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
+        "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
     },
     "NANOG": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/NANOG",
@@ -45,6 +48,7 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/NANOG/onePeak_Unique35_DGF",  # GENCODE_Unique35_DGF
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
+        "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
     }
 }
 
