@@ -70,3 +70,19 @@ def get_dl_kwargs(tf):
             "cell_line": cell_type,
             "use_linecache": True
             }
+
+
+def get_dl_kwargs_DREAM(tf):
+    """Returns the dataloader kwargs for each model"""
+    cell_type = TF2CT[tf]
+    intervals = DATA + f"raw/tfbinding/eval/tf-DREAM/DREAM.chr8.{tf}.{cell_type}.bed"
+
+    # FactorNet DNASE
+    dnase = DATA + "raw/tfbinding/eval/DNASE/FactorNet/{ctype}.1x.bw".format(ctype=cell_type)
+
+    return {"intervals_file": intervals,
+            "dnase_file": dnase,
+            "fasta_file": CHR_FASTA_FILE,
+            "cell_line": cell_type,
+            "use_linecache": True
+            }
