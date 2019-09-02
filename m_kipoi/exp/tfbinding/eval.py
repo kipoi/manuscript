@@ -5,12 +5,12 @@ from m_kipoi.metrics import MetricsTupleList, BootstrapMetric
 import sys
 
 
-def eval_model(tf, model, metrics, n_bootstrap=None, filter_dnase=False):
+def eval_model(tf, model, metrics, n_bootstrap=None, filter_dnase=False, eval_dir=None, intervals_file=None):
     exp_dict = [("tf", tf), 
                 ("model", model),
                 ("filter_dnase", filter_dnase)]
     try:
-        y_true, y_pred = get_eval_predictions(tf, model, filter_dnase)
+        y_true, y_pred = get_eval_predictions(tf, model, filter_dnase, eval_dir, intervals_file)
         if model == "DeepSEA":
             y_pred = y_pred[:, get_DeepSEA_idx(tf, TF2CT[tf])]
     except:
