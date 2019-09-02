@@ -34,7 +34,6 @@ ENVIRONMENTS = {
     "DeepBind": "DeepBind/Homo_sapiens/TF/D00317.009_ChIP-seq_CEBPB",
     "FactorNet": "FactorNet/JUND/meta_Unique35_DGF",
     "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
-    "lsgkm-SVM-1kb": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
 }
 
 ENVIRONMENT_NAMES = {
@@ -44,6 +43,7 @@ ENVIRONMENT_NAMES = {
     "FactorNet": "FactorNet",
     "lsgkm-SVM": "lsgkm-SVM",
     "lsgkm-SVM-1kb": "lsgkm-SVM",
+    "lsgkm-SVM-retrained": "lsgkm-SVM",
 }
 # --------------------------------------------
 
@@ -209,7 +209,7 @@ rule evaluate_models:
         from m_kipoi.exp.tfbinding.eval import eval_model
         from tqdm import tqdm
         from m_kipoi.metrics import classification_metrics
-        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'DeepSEA', 'FactorNet']
+        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'lsgkm-SVM-retrained', 'DeepSEA', 'FactorNet']
         df = pd.DataFrame(Parallel(n_jobs=32)(delayed(eval_model)(tf, model, classification_metrics,
                                                                   filter_dnase=filter_dnase)
                                               for model in tqdm(MODELS)

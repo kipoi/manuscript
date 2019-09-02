@@ -45,7 +45,6 @@ ENVIRONMENTS = {
     "DeepBind": "DeepBind/Homo_sapiens/TF/D00317.009_ChIP-seq_CEBPB",
     "FactorNet": "FactorNet/JUND/meta_Unique35_DGF",
     "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
-    "lsgkm-SVM-1kb": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
 }
 
 ENVIRONMENT_NAMES = {
@@ -55,6 +54,7 @@ ENVIRONMENT_NAMES = {
     "FactorNet": "FactorNet",
     "lsgkm-SVM": "lsgkm-SVM",
     "lsgkm-SVM-1kb": "lsgkm-SVM",
+    "lsgkm-SVM-retrained": "lsgkm-SVM",
 }
 # --------------------------------------------
 
@@ -135,7 +135,7 @@ rule evaluate_models:
         ddir = get_data_dir()
         eval_dir = os.path.join(ddir, 'processed/tfbinding/eval-DREAM/preds')
 
-        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'DeepSEA', 'FactorNet']
+        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'lsgkm-SVM-retrained', 'DeepSEA', 'FactorNet']
         # df = pd.DataFrame(Parallel(n_jobs=32)(delayed(eval_model)(tf, model, classification_metrics,
         #                                                           filter_dnase=filter_dnase,
         #                                                           eval_dir=eval_dir,
