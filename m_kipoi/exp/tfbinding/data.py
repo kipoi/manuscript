@@ -17,22 +17,22 @@ ddir = get_data_dir()
 
 def get_eval_predictions(tf, model, filter_dnase=False, eval_dir=None, intervals_file=None):
     """Get the predictions"""
+    ddir = get_data_dir()
     if eval_dir is None:
-        ddir = get_data_dir()
         eval_dir = os.path.join(ddir, 'processed/tfbinding/eval/preds')
         
     if intervals_file is None:
-        labels_bed_file = os.path.join(ddir, '..', get_dl_kwargs(tf)['intervals_file'])
+        intervals_file = os.path.join(ddir, '..', get_dl_kwargs(tf)['intervals_file'])
         
     with HDF5Reader(os.path.join(eval_dir, tf, model + ".h5")) as r:
         y_pred = r.f['/preds'][:]
 
-    df_unfiltered = pd.read_csv(labels_bed_file, sep="\t", header=None)
+    df_unfiltered = pd.read_csv(intervals_file, sep="\t", header=None)
     df_unfiltered.columns = ['chr', 'start', 'end', 'y_true']
     if filter_dnase:
         # Filter the DNase peaks based on the overlaps
         dnase_peaks = '{ddir}/raw/tfbinding/eval/tf-DREAM/DNASE.{ctype}.relaxed.narrowPeak.gz'.format(ddir=ddir, ctype=TF2CT[tf])
-        filtered_bed = BedTool(labels_bed_file).intersect(BedTool(dnase_peaks), u=True, wa=True, f=.5)
+        filtered_bed = BedTool(intervals_file).intersect(BedTool(dnase_peaks), u=True, wa=True, f=.5)
         df_filtered = pd.read_csv(filtered_bed.fn, sep="\t", header=None)
         df_filtered.columns = ['chr', 'start', 'end', 'y_true']
         df_filtered['filtered'] = True

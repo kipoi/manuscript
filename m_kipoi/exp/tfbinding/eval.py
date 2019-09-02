@@ -9,17 +9,17 @@ def eval_model(tf, model, metrics, n_bootstrap=None, filter_dnase=False, eval_di
     exp_dict = [("tf", tf), 
                 ("model", model),
                 ("filter_dnase", filter_dnase)]
-    try:
-        y_true, y_pred = get_eval_predictions(tf, model, filter_dnase, eval_dir, intervals_file)
-        if model == "DeepSEA":
-            y_pred = y_pred[:, get_DeepSEA_idx(tf, TF2CT[tf])]
-    except:
-        print("Exception occured")
-        print(sys.exc_info()[0])
-        if n_bootstrap is None:
-            return OrderedDict(exp_dict)
-        else:
-            return [OrderedDict(exp_dict)]
+    # try:
+    y_true, y_pred = get_eval_predictions(tf, model, filter_dnase, eval_dir, intervals_file)
+    if model == "DeepSEA":
+        y_pred = y_pred[:, get_DeepSEA_idx(tf, TF2CT[tf])]
+#     except:
+#         print("Exception occured")
+#         print(sys.exc_info()[0])
+#         if n_bootstrap is None:
+#             return OrderedDict(exp_dict)
+#         else:
+#             return [OrderedDict(exp_dict)]
     if n_bootstrap is None:
         # Filter by known regions
         return OrderedDict(exp_dict + MetricsTupleList(metrics)(y_true, y_pred))

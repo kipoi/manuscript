@@ -131,18 +131,25 @@ rule evaluate_models:
         from tqdm import tqdm
         from m_kipoi.metrics import classification_metrics
         from m_kipoi.config import get_data_dir
-        
+
         ddir = get_data_dir()
         eval_dir = os.path.join(ddir, 'processed/tfbinding/eval-DREAM/preds')
-        
+
         MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'DeepSEA', 'FactorNet']
-        df = pd.DataFrame(Parallel(n_jobs=32)(delayed(eval_model)(tf, model, classification_metrics,
+        # df = pd.DataFrame(Parallel(n_jobs=32)(delayed(eval_model)(tf, model, classification_metrics,
+        #                                                           filter_dnase=filter_dnase,
+        #                                                           eval_dir=eval_dir,
+        #                                                           intervals_file=os.path.join(ddir, '..', get_dl_kwargs_DREAM(tf)['intervals_file']))
+        #                                       for model in tqdm(MODELS)
+        #                                       for tf in tqdm(TFS)
+        #                                       for filter_dnase in [True, False]))
+        df = pd.DataFrame([eval_model(tf, model, classification_metrics,
                                                                   filter_dnase=filter_dnase,
                                                                   eval_dir=eval_dir,
                                                                   intervals_file=os.path.join(ddir, '..', get_dl_kwargs_DREAM(tf)['intervals_file']))
                                               for model in tqdm(MODELS)
                                               for tf in tqdm(TFS)
-                                              for filter_dnase in [True, False]))
+                                              for filter_dnase in [True, False]])
         # Make a nice column description
         df['dataset'] = "Chromosome wide (chr8))"
         df['dataset'][df.filter_dnase == True] = "Only accessible regions (chr8))"
