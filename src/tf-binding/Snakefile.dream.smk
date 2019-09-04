@@ -167,6 +167,7 @@ rule plot:
                              fmt=['pdf', 'png'])
     run:
         import matplotlib
+        import matplotlib.pyplot as plt
         matplotlib.use('Agg')
         matplotlib.rcParams['pdf.fonttype'] = 42
         matplotlib.rcParams['ps.fonttype'] = 42
@@ -183,6 +184,7 @@ rule plot:
                            size=5, kind="bar", palette=pallete)
         g.set_xlabels("Transcription Factor")
         g.set_ylabels("auPRC")
+        plt.title("DREAM-labels, whole chr8")
         for fname in output.files_all:
             g.savefig(fname)
 
@@ -191,5 +193,6 @@ rule plot:
                            size=5, kind="bar", palette=pallete)
         g.set_xlabels("Transcription Factor")
         g.set_ylabels("auPRC")
+        plt.title("DREAM-labels, DNase peaks only (chr8)")
         for fname in output.files_dnase:
             g.savefig(fname)
