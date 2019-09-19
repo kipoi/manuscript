@@ -33,6 +33,7 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/JUND/meta_Unique35_DGF_2",  # meta_Unique35_DGF_2
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Jund/Hepg2/Sydh_Iggrab",
+        "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Jund/Hepg2/Sydh_Iggrab",
     },
     "MAFK": {
@@ -41,6 +42,7 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/MAFK/meta_1_Unique35_DGF",
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
+        "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
     },
     "NANOG": {
@@ -49,9 +51,51 @@ SINGLE_TASK_MODELS = {
         "FactorNet": "FactorNet/NANOG/onePeak_Unique35_DGF",  # GENCODE_Unique35_DGF
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
+        "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
     }
 }
+
+# interval files
+DATASETS = {
+    "kipoi": {"long_name": "Kipoi-manuscript labels",
+              "intervals": {tf: (f"{DATA}raw/tfbinding/eval/tf-DREAM/"
+                                 "chr8_wide_bin101_flank0_stride101.{tf}.{cell_type}.intervals_file.tsv")
+                            for tf, cell_type in TF_C_pairs},
+              "tfs": TFS,
+              },
+    "DREAM": {"long_name": "DREAM labels",
+              "intervals": {tf: f"{DATA}raw/tfbinding/eval/tf-DREAM/DREAM.chr8.{tf}.{cell_type}.bed"
+                            for tf, cell_type in TF_C_pairs},
+              "tfs": [t for t in TFS if t != 'MAFK'],
+              },
+    "beer-300bp": {"long_name": "Beer 300 bp labels",
+                   "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/chr8_300.{tf}.{cell_type}.intervals_file.tsv"
+                                 for tf, cell_type in TF_C_pairs},
+                   "tfs": TFS,
+                   },
+    "beer-1kb": {"long_name": "Beer 1 kb labels",
+                 "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/chr8_1000.{tf}.{cell_type}.intervals_file.tsv"
+                               for tf, cell_type in TF_C_pairs},
+                 "tfs": TFS,
+                 },
+    "resized-beer-300bp-to-100bp": {"long_name": "Beer 300 bp labels resized to 100 bp",
+                                    "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/extended/chr8_300.{tf}.{cell_type}.intervals_file.tsv.extended-100bp.tsv"
+                                                  for tf, cell_type in TF_C_pairs},
+                                    "tfs": TFS,
+                                    },
+}
+
+
+def get_dataset_dl_kwargs(tf, dataset):
+    """Returns the dataloader kwargs for each model"""
+    cell_type = TF2CT[tf]
+    return {"intervals_file": DATASETS[dataset]['intervals'][tf],
+            "dnase_file": f"{DATA}raw/tfbinding/eval/DNASE/FactorNet/{cell_type}.1x.bw",
+            "fasta_file": CHR_FASTA_FILE,
+            "cell_line": cell_type,
+            "use_linecache": True
+            }
 
 
 # Evaluate the models - kwargs
