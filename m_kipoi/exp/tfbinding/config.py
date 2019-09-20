@@ -26,6 +26,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
     },
     "JUND": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/JUND",
@@ -35,6 +36,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Jund/Hepg2/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Jund/Hepg2/Sydh_Iggrab",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
     },
     "MAFK": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/MAFK",
@@ -44,6 +46,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
     },
     "NANOG": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/NANOG",
@@ -53,6 +56,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
     }
 }
 
@@ -84,6 +88,11 @@ DATASETS = {
                                                   for tf, cell_type in TF_C_pairs},
                                     "tfs": TFS,
                                     },
+    # "jittered-beer-300bp-by-50bp": {"long_name": "Beer 300 bp labels with positive jittered +- 50 bp",
+    #                                 "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/jittered/chr8_300.{tf}.{cell_type}.intervals_file.tsv.jittered-50bp.tsv"
+    #                                               for tf, cell_type in TF_C_pairs},
+    #                                 "tfs": TFS,
+    #                                 },
 }
 
 

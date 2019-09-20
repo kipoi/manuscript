@@ -45,6 +45,7 @@ ENVIRONMENT_NAMES = {
     "lsgkm-SVM": "lsgkm-SVM",
     "lsgkm-SVM-1kb": "lsgkm-SVM",
     "lsgkm-SVM-retrained": "lsgkm-SVM",
+    "lsgkm-SVM-retrained-1kb": "lsgkm-SVM",
 }
 # --------------------------------------------
 
@@ -131,7 +132,6 @@ rule evaluate_models:
         ddir = get_data_dir()
         eval_dir = os.path.join(ddir, f'processed/tfbinding/eval-{wildcards.dataset}/preds')
 
-        MODELS = ['pwm_HOCOMOCO', 'DeepBind', 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'lsgkm-SVM-retrained', 'DeepSEA', 'FactorNet']
         # df = pd.DataFrame(Parallel(n_jobs=32)(delayed(eval_model)(tf, model, classification_metrics,
         #                                                           filter_dnase=filter_dnase,
         #                                                           eval_dir=eval_dir,
@@ -143,8 +143,8 @@ rule evaluate_models:
                                       filter_dnase=filter_dnase,
                                       eval_dir=eval_dir,
                                       intervals_file=os.path.join(ddir, '..', get_dataset_dl_kwargs(tf, dataset=wildcards.dataset)['intervals_file']))
-                           for model in tqdm(MODELS)
                            for tf in tqdm(DATASETS[wildcards.dataset]['tfs'])
+                           for model in tqdm(SINGLE_TASK_MODELS[tf].keys())
                            for filter_dnase in [True, False]])
         # Make a nice column description
         df['dataset'] = "Chromosome wide (chr8))"

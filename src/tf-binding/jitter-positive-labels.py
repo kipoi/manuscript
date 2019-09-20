@@ -1,13 +1,8 @@
 """
-Extend the resolution of the 300bp labels to 100 bp
-
-Original  ->    New
-[   1   ] -> [0][1][0]
-[   0   ] -> [0][0][0]
-
-Note: Run this script from the repository root.
+Jitter the positive labels by shifting the interval location +- 50bp
 """
 import os
+import random
 from m_kipoi.exp.tfbinding.config import (DATA, TF_C_pairs, TFS, CELL_TYPES,
                                           DATASETS,
                                           NUM_FASTA_FILE, CHR_FASTA_FILE,
@@ -21,22 +16,18 @@ def extend_lines(line):
     label = int(label)
     assert end - start == 300  # intervals have to be 300 bp in size
     if label == 0:
-        return [f"{chr}\t{start + shift}\t{start + 100 + shift}\t{label}\n"
-                for shift in [0, 100, 200]]
+        return [line]
     else:
-        return [f"{chr}\t{start + shift}\t{start + 100 + shift}\t{label}\n"
-                for shift, label in [(0, 0),
-                                     (100, 1),
-                                     (200, 0)]]
+        shift = random.randint(-50, 50)  # jitter +- 50
+        return [f"{chr}\t{start + shift}\t{end + shift}\t{label}\n"]
 
-
-# fpath = '/data/ouga04b/ag_gagneur/project_local/avsec/kipoi/manuscript/data/raw/tfbinding/eval/Beer-tfbinding/chr8_300.JUND.HepG2.intervals_file.tsv'
 
 if __name__ == '__main__':
+    random.seed(42)
     for fpath in DATASETS['beer-300bp']['intervals'].values():
         print(f"fpath: {fpath}")
         with open(fpath, 'r') as f:
-            with open(os.path.join(os.path.dirname(fpath), 'extended', os.path.basename(fpath) + ".extended-100bp.tsv"), 'w') as fw:
+            with open(os.path.join(os.path.dirname(fpath), 'jittered', os.path.basename(fpath) + ".jittered-50bp.tsv"), 'w') as fw:
                 for line in f:
                     output_lines = extend_lines(line)
                     fw.writelines(output_lines)
