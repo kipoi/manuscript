@@ -26,7 +26,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
-        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
+        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
     },
     "JUND": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/JUND",
@@ -36,7 +36,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Jund/Hepg2/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Jund/Hepg2/Sydh_Iggrab",
-        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
+        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
     },
     "MAFK": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/MAFK",
@@ -46,7 +46,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
-        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
+        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
     },
     "NANOG": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/NANOG",
@@ -56,7 +56,7 @@ SINGLE_TASK_MODELS = {
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
-        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
+        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
     }
 }
 
@@ -64,14 +64,14 @@ SINGLE_TASK_MODELS = {
 DATASETS = {
     "kipoi": {"long_name": "Kipoi-manuscript labels",
               "intervals": {tf: (f"{DATA}raw/tfbinding/eval/tf-DREAM/"
-                                 "chr8_wide_bin101_flank0_stride101.{tf}.{cell_type}.intervals_file.tsv")
+                                 f"chr8_wide_bin101_flank0_stride101.{tf}.{cell_type}.intervals_file.tsv")
                             for tf, cell_type in TF_C_pairs},
               "tfs": TFS,
               },
     "DREAM": {"long_name": "DREAM labels",
               "intervals": {tf: f"{DATA}raw/tfbinding/eval/tf-DREAM/DREAM.chr8.{tf}.{cell_type}.bed"
                             for tf, cell_type in TF_C_pairs},
-              "tfs": [t for t in TFS if t != 'MAFK'],
+              "tfs": TFS, # [t for t in TFS if t != 'MAFK'],
               },
     "beer-300bp": {"long_name": "Beer 300 bp labels",
                    "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/chr8_300.{tf}.{cell_type}.intervals_file.tsv"
