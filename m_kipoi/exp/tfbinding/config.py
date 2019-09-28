@@ -21,42 +21,46 @@ SINGLE_TASK_MODELS = {
     "CEBPB": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/CEBPB",
         "DeepBind": "DeepBind/Homo_sapiens/TF/D00317.009_ChIP-seq_CEBPB",
+        "DeepBind-1kb": "DeepBind-1kb/Homo_sapiens/TF/D00317.009_ChIP-seq_CEBPB",
         "FactorNet": "FactorNet/CEBPB/meta_Unique35_DGF",
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
-        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Cebpb/Helas3/Sydh_Iggrab",
     },
     "JUND": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/JUND",
         "DeepBind": "DeepBind/Homo_sapiens/TF/D00776.005_ChIP-seq_JUND",
+        "DeepBind-1kb": "DeepBind-1kb/Homo_sapiens/TF/D00776.005_ChIP-seq_JUND",
         "FactorNet": "FactorNet/JUND/meta_Unique35_DGF_2",  # meta_Unique35_DGF_2
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Jund/Hepg2/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Jund/Hepg2/Sydh_Iggrab",
-        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Jund/Hepg2/Sydh_Iggrab",
     },
     "MAFK": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/MAFK",
         "DeepBind": "DeepBind/Homo_sapiens/TF/D00503.014_ChIP-seq_MAFK",
+        "DeepBind-1kb": "DeepBind-1kb/Homo_sapiens/TF/D00503.014_ChIP-seq_MAFK",
         "FactorNet": "FactorNet/MAFK/meta_1_Unique35_DGF",
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
-        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Mafkab50322/K562/Sydh_Iggrab",
     },
     "NANOG": {
         "pwm_HOCOMOCO": "pwm_HOCOMOCO/human/NANOG",
         "DeepBind": "DeepBind/Homo_sapiens/TF/D00786.001_ChIP-seq_NANOG",
+        "DeepBind-1kb": "DeepBind-1kb/Homo_sapiens/TF/D00786.001_ChIP-seq_NANOG",
         "FactorNet": "FactorNet/NANOG/onePeak_Unique35_DGF",  # GENCODE_Unique35_DGF
         "DeepSEA": "DeepSEA/predict",
         "lsgkm-SVM": "lsgkm-SVM/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
         "lsgkm-SVM-1kb": "lsgkm-SVM-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
         "lsgkm-SVM-retrained": "lsgkm-SVM-retrained/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
-        "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
+        # "lsgkm-SVM-retrained-1kb": "lsgkm-SVM-retrained-1kb/Tfbs/Nanogsc33759/H1hesc/Haib_V0416102",
     }
 }
 

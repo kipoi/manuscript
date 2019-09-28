@@ -41,6 +41,7 @@ ENVIRONMENT_NAMES = {
     "DeepSEA": "DeepSEA",
     "pwm_HOCOMOCO": "pwm_HOCOMOCO",
     "DeepBind": "DeepBind",
+    "DeepBind-1kb": "DeepBind",
     "FactorNet": "FactorNet",
     "lsgkm-SVM": "lsgkm-SVM",
     "lsgkm-SVM-1kb": "lsgkm-SVM",
@@ -98,7 +99,7 @@ rule predict:
         gpu = config['gpu']
     threads: 8
     resources:
-        gpu = lambda w: 1 if w.model.split("/")[0] in ['DeepSEA', 'DeepBind', 'FactorNet'] else 0
+        gpu = lambda w: 1 if w.model.split("/")[0] in ['DeepSEA', 'DeepBind', 'FactorNet', 'DeepBind-1kb'] else 0
     shell:
         """
         echo batch size: {params.batch_size}
@@ -174,6 +175,11 @@ rule plot:
         df = pd.read_csv(input.csv)
         pallete = ['#8dd3c7', '#fdb462', '#bebada', '#fb8072', '#80b1d3']
         df = df.rename(columns={"model": "Model"})
+        # order the categories
+        df['Model'] = pd.Categorical(df['Model'],
+                                     categories=['pwm_HOCOMOCO', 'DeepBind', 'DeepBind-1kb',
+                                                 'lsgkm-SVM', 'lsgkm-SVM-1kb', 'lsgkm-SVM-retrained',
+                                                  'DeepSEA', 'FactorNet'])
 
         # filter_dnase=False
         g = sns.factorplot(x="tf", y="auPR", hue="Model", data=df[~df.filter_dnase],
