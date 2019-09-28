@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from collections import OrderedDict
-from concise.eval_metrics import auprc, auc, accuracy
+from concise.eval_metrics import _mask_value_nan, auprc, auc, accuracy
 
 # Metric helpers
 
@@ -71,6 +71,19 @@ class MetricsOrderedDict:
 
 # -----------------------------
 
+def auprc_PRROC(y_true, y_pred):
+    """Get the auprc_PRROC evaluation metric
+    """
+    import rpy2.robjects as robjects
+    robjects.r('library("PRROC")')
+    fn = robjects.r['pr.curve']
+
+    # remove -1 classes
+    y_true, y_pred = _mask_value_nan(y_true, y_pred)
+    class1p = robjects.FloatVector(list(y_pred[y_true == 1]))
+    class0p = robjects.FloatVector(list(y_pred[y_true == 0]))
+    return fn(class1p, class0p).rx2("auc.davis.goadrich")[0]
+
 
 def n_positive(y_true, y_pred):
     return y_true.sum()
@@ -85,7 +98,8 @@ def frac_positive(y_true, y_pred):
 
 
 classification_metrics = [
-    ("auPR", auprc),
+    ("auPR", auprc_PRROC),
+    ("auPR_scikit", auprc),
     ("auROC", auc),
     ("accuracy", accuracy),
     ("n_positive", n_positive),
