@@ -75,7 +75,7 @@ DATASETS = {
     "DREAM": {"long_name": "DREAM labels",
               "intervals": {tf: f"{DATA}raw/tfbinding/eval/tf-DREAM/DREAM.chr8.{tf}.{cell_type}.bed"
                             for tf, cell_type in TF_C_pairs},
-              "tfs": TFS, # [t for t in TFS if t != 'MAFK'],
+              "tfs": TFS,  # [t for t in TFS if t != 'MAFK'],
               },
     "beer-300bp": {"long_name": "Beer 300 bp labels",
                    "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/chr8_300.{tf}.{cell_type}.intervals_file.tsv"
@@ -87,11 +87,11 @@ DATASETS = {
                                for tf, cell_type in TF_C_pairs},
                  "tfs": TFS,
                  },
-    "resized-beer-300bp-to-100bp": {"long_name": "Beer 300 bp labels resized to 100 bp",
-                                    "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/extended/chr8_300.{tf}.{cell_type}.intervals_file.tsv.extended-100bp.tsv"
-                                                  for tf, cell_type in TF_C_pairs},
-                                    "tfs": TFS,
-                                    },
+    # "resized-beer-300bp-to-100bp": {"long_name": "Beer 300 bp labels resized to 100 bp",
+    #                                 "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/extended/chr8_300.{tf}.{cell_type}.intervals_file.tsv.extended-100bp.tsv"
+    #                                               for tf, cell_type in TF_C_pairs},
+    #                                 "tfs": TFS,
+    #                                 },
     # "jittered-beer-300bp-by-50bp": {"long_name": "Beer 300 bp labels with positive jittered +- 50 bp",
     #                                 "intervals": {tf: f"{DATA}raw/tfbinding/eval/beer-tfbinding/jittered/chr8_300.{tf}.{cell_type}.intervals_file.tsv.jittered-50bp.tsv"
     #                                               for tf, cell_type in TF_C_pairs},
