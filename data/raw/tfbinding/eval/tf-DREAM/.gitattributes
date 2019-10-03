@@ -1,0 +1,10 @@
+chr8_wide_bin101_flank0_stride101.CEBPB.HeLa-S3.intervals_file.tsv.gz filter=lfs diff=lfs merge=lfs -text
+chr8_wide_bin101_flank0_stride101.NANOG.H1-hESC.intervals_file.tsv.gz filter=lfs diff=lfs merge=lfs -text
+DNASE.HeLa-S3.relaxed.narrowPeak.gz filter=lfs diff=lfs merge=lfs -text
+DNASE.HepG2.relaxed.narrowPeak.gz filter=lfs diff=lfs merge=lfs -text
+chr8_wide_bin101_flank0_stride101.JUND.HepG2.intervals_file.tsv.gz filter=lfs diff=lfs merge=lfs -text
+chr8_wide_bin101_flank0_stride101.MAFK.K562.intervals_file.tsv.gz filter=lfs diff=lfs merge=lfs -text
+DNASE.H1-hESC.relaxed.narrowPeak.gz filter=lfs diff=lfs merge=lfs -text
+DNASE.K562.relaxed.narrowPeak.gz filter=lfs diff=lfs merge=lfs -text
+README.md filter=lfs diff=lfs merge=lfs -text
+intervals filter=lfs diff=lfs merge=lfs -text
